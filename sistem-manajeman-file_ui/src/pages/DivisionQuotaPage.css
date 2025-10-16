@@ -1,0 +1,90 @@
+/* File: src/pages/DivisionQuotaPage.css (VERSI FINAL) */
+
+.quota-container {
+  padding: 1rem;
+}
+
+.division-list {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.division-item {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 1rem;
+  border: 1px solid #dee2e6;
+}
+
+.division-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.division-name {
+  font-size: 1.1rem;
+}
+
+.division-usage {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.progress-bar-container {
+  width: 100%;
+  background-color: #e9ecef;
+  border-radius: 10px;
+  height: 10px;
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.3s ease-in-out, background-color 0.3s ease-in-out;
+}
+
+.btn-atur-kuota {
+  padding: 0.5rem 1rem;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-atur-kuota:hover {
+  background-color: #5a6268;
+}
+
+.usage-details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+}
+
+.division-usage-percentage {
+  font-size: 0.8em;
+  color: #6c757d;
+  font-weight: bold;
+}
+
+/* KODE BARU (JAUH LEBIH KUAT) */
+.quota-container .division-item .progress-bar.primary {
+  background-color: #03ab00 !important; /* Biru */
+}
+
+.quota-container .division-item .progress-bar.warning {
+  background-color: #ebe817 !important; /* Kuning */
+}
+
+.quota-container .division-item .progress-bar.danger {
+  background-color: #dc3545 !important; /* Merah */
+}

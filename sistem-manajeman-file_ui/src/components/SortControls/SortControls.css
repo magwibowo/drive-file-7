@@ -1,0 +1,41 @@
+/* src/components/SortControls/SortControls.css */
+.sort-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: #ffffff;
+    padding: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e5e7eb;
+}
+
+.sort-label {
+    font-weight: 600;
+    color: #4b5563;
+}
+
+.sort-button {
+    background: none;
+    border: 1px solid #d1d5db;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #374151;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.sort-button:hover {
+    background-color: #f3f4f6;
+    border-color: #9ca3af;
+}
+
+.sort-button.active {
+    background-color: #e0e7ff; /* A light blue to indicate active sort */
+    border-color: #6366f1; /* A darker blue for active border */
+    color: #1f2937;
+    font-weight: 600;
+}

@@ -1,0 +1,57 @@
+/* src/pages/KelolaFolderPage.css */
+
+.kelola-folder-page .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+/* Menggunakan kembali style dari file lain agar konsisten */
+.kelola-folder-page h1 { margin: 0; font-size: 1.8rem; }
+.kelola-folder-page .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: 500; border: none; cursor: pointer; }
+.kelola-folder-page .btn-primary { background-color: #0d6efd; color: white; }
+
+/* Breadcrumb interaktif */
+.kelola-folder-page .breadcrumbs .breadcrumb-item {
+  cursor: pointer;
+}
+.kelola-folder-page .breadcrumbs .breadcrumb-item:hover {
+  text-decoration: underline;
+}
+
+.kelola-folder-page .table-wrapper { background-color: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); overflow-x: auto; }
+.kelola-folder-page .data-table { width: 100%; border-collapse: collapse; }
+.kelola-folder-page .data-table th, .kelola-folder-page .data-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #f0f0f0; }
+.kelola-folder-page .data-table th { font-weight: 500; color: #6c757d; }
+
+.kelola-folder-page .action-buttons { display: flex; gap: 10px; }
+.kelola-folder-page .btn-icon { background: none; border: none; cursor: pointer; font-size: 1rem; padding: 5px; border-radius: 4px; }
+.kelola-folder-page .btn-edit { color: #0d6efd; }
+.kelola-folder-page .btn-delete { color: #dc3545; }
+
+.folder-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 500;
+}
+.page-header .button-group {
+  display: flex;
+  gap: 12px;
+}
+
+/* BARU: Style untuk tombol sekunder (Lihat Sampah, Kembali) */
+.btn-secondary {
+  background-color: #f8f9fa;
+  color: #212529;
+  border: 1px solid #dee2e6;
+}
+.btn-secondary:hover {
+  background-color: #e2e6ea;
+}
+
+/* BARU: Style untuk tombol aksi di dalam tabel sampah */
+.btn-restore {
+  color: #198754; /* Warna hijau untuk restore */
+}

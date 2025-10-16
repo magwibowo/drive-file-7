@@ -1,0 +1,126 @@
+.progress-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.progress-modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: left;
+}
+
+.progress-modal-content h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.upload-list {
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.upload-item {
+    display: grid;
+    grid-template-columns: 1fr 2fr auto;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+    gap: 15px;
+}
+
+.upload-item:last-child {
+    border-bottom: none;
+}
+
+.file-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.file-name {
+    font-weight: bold;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.upload-size-info {
+    font-size: 0.85em;
+    color: #555;
+    margin: 0;
+}
+
+.progress-bar-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.progress-modal-content .progress-bar-container {
+    flex-grow: 1;
+    background: linear-gradient(90deg, #e0e0e0 0%, #f5f5f5 100%);
+    border-radius: 10px;
+    height: 28px;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.12);
+    overflow: hidden;
+    border: 1px solid #cfd8dc;
+}
+
+/* --- PERUBAHAN KUNCI DI SINI --- */
+/* Aturan ini sekarang hanya berlaku untuk progress bar di dalam modal */
+.progress-modal-content .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #43e97b 0%, #38f9d7 100%);
+    width: 0%;
+    border-radius: 10px;
+    text-align: center;
+    line-height: 28px;
+    color: #fff;
+    font-weight: bold;
+    box-shadow: 0 1px 4px rgba(56, 249, 215, 0.15);
+    transition: width 0.3s cubic-bezier(.4,2,.3,1);
+    font-size: 0.9em;
+    letter-spacing: 1px;
+}
+
+.cancel-button {
+    background: none;
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: bold;
+    color: #555;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.cancel-button:hover {
+    background-color: #f00;
+    color: white;
+    border-color: #f00;
+}
+
+.file-status {
+    font-size: 0.8em;
+    color: #777;
+    margin: 0;
+    text-align: right;
+}

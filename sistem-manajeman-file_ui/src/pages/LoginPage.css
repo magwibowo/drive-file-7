@@ -1,0 +1,169 @@
+/* src/pages/LoginPage.css */
+
+.login-page {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.left-pane {
+    flex: 1;
+    background-image: url('../../public/images/imgKereta.jpg'); /* Path disesuaikan */
+    background-size: cover;
+    background-position: left;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    position: relative;
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(7, 3, 72, 0.703);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    text-align: left;
+    padding: 20px;
+}
+
+.overlay-title {
+    width: 80px; /* Adjust as needed */
+    height: auto;
+    margin-bottom: 10px;
+    margin-top: 20px;
+    margin-left: 20px;
+}
+
+.overlay-subtitle {
+    font-size: 1rem;
+    max-width: 400px;
+    margin-left: 20px;
+}
+
+.daop7drv-logo {
+    width: 100%;
+    height: auto;
+    filter: drop-shadow( 0px 0px 10px rgb(7, 6, 93));
+}
+
+.right-pane {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f8f9fa;
+    padding: 40px;
+}
+
+.login-box {
+    padding: 50px 40px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    border-radius: 12px;
+    background-color: white;
+    width: 100%;
+    max-width: 400px;
+}
+
+.login-box .title {
+    color: #0D2A51;
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.title-underline {
+    width: 50px;
+    height: 4px;
+    background-color: #F58220;
+    border-radius: 2px;
+    margin: 0 auto 30px auto;
+}
+
+.input-group {
+    margin-bottom: 25px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #555;
+    font-weight: 600;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px 15px;
+    box-sizing: border-box;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.input-group input:focus {
+    border-color: #0D2A51;
+    box-shadow: 0 0 0 3px rgba(13, 42, 81, 0.1);
+    outline: none;
+}
+
+.password-input-container {
+    position: relative;
+}
+
+.password-toggle-icon {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #888;
+}
+
+.login-button {
+    width: 100%;
+    padding: 15px;
+    background-color: #F58220;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: bold;
+    transition: background-color 0.3s, transform 0.1s;
+}
+
+.login-button:hover {
+    background-color: #e0701b;
+}
+
+.error-message {
+    color: #d93025;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+}
+/* Ganti style .error-message yang lama dengan ini */
+.error-message {
+    background-color: #f8d7da; /* Warna latar merah muda */
+    color: #721c24;             /* Warna teks merah tua */
+    border: 1px solid #f5c6cb;  /* Warna border merah muda */
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+    text-align: center;
+    display: flex; /* Untuk ikon (opsional) */
+    align-items: center; /* Untuk ikon (opsional) */
+    justify-content: center; /* Untuk ikon (opsional) */
+    gap: 8px; /* Jarak antara ikon dan teks (opsional) */
+}

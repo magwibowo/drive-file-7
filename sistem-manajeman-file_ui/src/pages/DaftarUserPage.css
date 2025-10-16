@@ -1,0 +1,81 @@
+/* Grup untuk tombol di header kanan */
+.button-group {
+  display: flex;
+  gap: 12px;
+}
+
+/* Tombol Aksi Utama (Biru) */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn-primary {
+  background-color: #0d6efd;
+  color: white;
+}
+.btn-primary:hover {
+  background-color: #0b5ed7;
+}
+
+/* Tombol Aksi Sekunder (Abu-abu) */
+.btn-secondary {
+  background-color: #f8f9fa;
+  color: #212529;
+  border: 1px solid #dee2e6;
+}
+.btn-secondary:hover {
+  background-color: #e2e6ea;
+}
+
+/* Tombol ikon untuk aksi di tabel */
+.btn-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 5px;
+  border-radius: 4px;
+}
+.btn-restore {
+  color: #198754; /* Hijau */
+}
+.btn-delete {
+  color: #dc3545; /* Merah */
+}
+.btn-edit {
+  color: #0d6efd; /* Biru */
+}
+.table-wrapper { 
+  background-color: #fff; 
+  border: 1px solid #e0e0e0; 
+  border-radius: 8px; 
+  padding: 1rem; 
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+  overflow-x: auto; 
+}
+
+.data-table { 
+  width: 100%; 
+  border-collapse: collapse; 
+}
+
+.data-table th, 
+.data-table td { 
+  padding: 12px 15px; 
+  text-align: left; 
+  border-bottom: 1px solid #f0f0f0; 
+}
+
+.data-table th { 
+  font-weight: 500; 
+  color: #6c757d; /* <-- Ini yang membuat header abu-abu */
+}
