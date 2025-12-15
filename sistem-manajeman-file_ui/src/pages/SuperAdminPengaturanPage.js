@@ -2,6 +2,7 @@ import { useState } from "react";
 // Impor komponen dari kedua branch
 import BackupPage from "./BackupPage";
 import DivisionQuotaPage from "./DivisionQuotaPage";
+import ServerMonitor from "../components/ServerMonitor/ServerMonitor";
 import "./SuperAdminPengaturanPage.css";
 
 export default function SuperAdminPengaturanPage() {
@@ -32,6 +33,12 @@ export default function SuperAdminPengaturanPage() {
         >
           Kuota Divisi
         </button>
+        <button
+          className={`tab-btn ${activeTab === "monitor" ? "active" : ""}`}
+          onClick={() => setActiveTab("monitor")}
+        >
+          Server Monitor
+        </button>
       </div>
 
       {/* Isi Konten yang sudah digabung */}
@@ -47,6 +54,9 @@ export default function SuperAdminPengaturanPage() {
         
         {/* Konten untuk tab "Kuota Divisi" dari production_ui ditambahkan kembali */}
         {activeTab === "quota" && <DivisionQuotaPage />}
+
+        {/* Tab Server Monitor */}
+        {activeTab === "monitor" && <ServerMonitor />}
       </div>
     </div>
   );

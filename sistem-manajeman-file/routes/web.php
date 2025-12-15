@@ -16,3 +16,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+// Livewire Server Monitor Route (opsional - untuk standalone view)
+// Akses: http://localhost:8000/server-monitor
+// Route::get('/server-monitor', App\Livewire\ServerMonitor::class)->name('server-monitor');

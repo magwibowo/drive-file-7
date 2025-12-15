@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\Role;
 use App\Http\Controllers\Api\SuperAdminController;
 use App\Http\Controllers\Api\Admin\FolderController;
+use App\Http\Controllers\Api\ServerMetricsController;
 
 // Rute Publik
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login');
@@ -102,6 +103,15 @@ Route::prefix('backups')->group(function () {
             Route::get('/login-history', [SuperAdminController::class, 'getLoginHistory']);
             Route::delete('/login-history', [SuperAdminController::class, 'purgeLoginHistory']);
             Route::get('/login-history/count-purge', [SuperAdminController::class, 'countLoginHistoryForPurge']);
+
+            // Server Monitoring Routes
+            Route::prefix('server-metrics')->group(function () {
+                Route::post('/start', [ServerMetricsController::class, 'start']);
+                Route::post('/poll', [ServerMetricsController::class, 'poll']);
+                Route::post('/stop', [ServerMetricsController::class, 'stop']);
+                Route::get('/history', [ServerMetricsController::class, 'history']);
+                Route::get('/latest', [ServerMetricsController::class, 'latest']);
+            });
         });
     });
 
