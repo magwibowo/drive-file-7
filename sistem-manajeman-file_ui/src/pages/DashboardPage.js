@@ -10,6 +10,7 @@ import './DashboardView.css';
 import Modal from '../components/Modal/Modal';
 import FileUploadForm from '../components/FileUploadForm/FileUploadForm';
 import ConfirmationModal from '../components/ConfirmationModal/ConfirmationModal';
+import BatchConflictModal from '../components/BatchConflictModal/BatchConflictModal';
 import Notification from '../components/Notification/Notification';
 import FileCard from '../components/FileCard/FileCard';
 import FilePreviewModal from '../components/FilePreviewModal/FilePreviewModal';
@@ -104,9 +105,8 @@ const DivisionUserDashboard = ({ viewingAsAdminForDivision, onExitAdminView }) =
     const [viewMode, setViewMode] = useState('list');
     const [previewFile, setPreviewFile] = useState(null);
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-    const [overwriteModal, setOverwriteModal] = useState({ isOpen: false, file: null, message: '' });
+    const [batchConflictModal, setBatchConflictModal] = useState({ isOpen: false, files: [], folderId: null, divisionId: null });
     const [renameModal, setRenameModal] = useState({ isOpen: false, file: null, newName: '', extension: '' });
-    const [renameUploadModal, setRenameUploadModal] = useState({ isOpen: false, file: null, newName: '' });
     const [sortBy, setSortBy] = useState('updated_at');
     const [sortOrder, setSortOrder] = useState('desc');
     const [selectedFileIds, setSelectedFileIds] = useState([]);
@@ -245,8 +245,14 @@ const DivisionUserDashboard = ({ viewingAsAdminForDivision, onExitAdminView }) =
         setNotification({ isOpen: true, message: 'File berhasil diunggah!', type: 'success' });
     };
 
-    const handleConflict = (file, message) => {
-        setOverwriteModal({ isOpen: true, file: file, message: message });
+    const handleConflict = (conflictedFiles, folderId, divisionId) => {
+        // conflictedFiles adalah array dari { file, message, id }
+        setBatchConflictModal({ 
+            isOpen: true, 
+            files: conflictedFiles,
+            folderId: folderId,
+            divisionId: divisionId
+        });
         setIsUploadModalOpen(false);
     };
 
@@ -370,59 +376,62 @@ const DivisionUserDashboard = ({ viewingAsAdminForDivision, onExitAdminView }) =
         }
     };
 
-const executeUpload = async (file, options = {}) => {
-    const formData = new FormData();
-    formData.append('file', file);
-    if (options.newName) {
-        formData.append('new_name', options.newName);
-    }
-    if (options.overwrite) {
-        formData.append('overwrite', true);
-    }
-
-    try {
-        const fid = searchParams.get('folder_id');
-        if (fid) {
-            formData.append('folder_id', fid);
-        }
-
-        // FIX: Tambahkan division_id jika super admin upload ke drive divisi lain
-        if (viewingAsAdminForDivision) {
-            formData.append('division_id', viewingAsAdminForDivision.id);
-        }
-
-        await uploadFile(formData, options);
-        const successMessage = options.overwrite
-            ? 'File berhasil ditimpa!'
-            : (options.newName
-                ? 'File berhasil diunggah dengan nama baru!'
-                : 'File berhasil diunggah!');
-        setNotification({ isOpen: true, message: successMessage, type: 'success' });
-        fetchFiles();
-    } catch (err) {
-        if (err.response) {
-            if (err.response.status === 409) {
-                handleConflict(file, err.response.data.message);
-            } else if (err.response.status === 403) {
-                setNotification({
-                    isOpen: true,
-                    message: err.response.data.message || 'Gagal: Kuota penyimpanan penuh.',
-                    type: 'error'
-                });
-            } else {
-                console.error('Upload error:', err.response.data);
-                setNotification({ isOpen: true, message: 'Gagal mengunggah file. Terjadi masalah di server.', type: 'error' });
+    const handleBatchConflictResolve = async (fileDecisions) => {
+        let successCount = 0;
+        let failCount = 0;
+        
+        for (const conflictedFile of batchConflictModal.files) {
+            const decision = fileDecisions[conflictedFile.id];
+            
+            if (decision.action === 'skip') {
+                continue; // Lewati file ini
             }
-        } else {
-            console.error('Upload error:', err.message);
-            setNotification({ isOpen: true, message: 'Gagal mengunggah file. Periksa koneksi Anda.', type: 'error' });
+            
+            const formData = new FormData();
+            formData.append('file', conflictedFile.file);
+            
+            if (batchConflictModal.folderId) {
+                formData.append('folder_id', batchConflictModal.folderId);
+            }
+            if (batchConflictModal.divisionId || viewingAsAdminForDivision) {
+                formData.append('division_id', batchConflictModal.divisionId || viewingAsAdminForDivision.id);
+            }
+            
+            if (decision.action === 'overwrite') {
+                formData.append('overwrite', true);
+            } else if (decision.action === 'auto_rename') {
+                formData.append('auto_rename', true);
+            } else if (decision.action === 'rename' && decision.newName) {
+                formData.append('new_name', decision.newName);
+            }
+            
+            try {
+                await uploadFile(formData);
+                successCount++;
+            } catch (err) {
+                failCount++;
+                console.error(`Failed to upload ${conflictedFile.file.name}:`, err);
+            }
         }
-    }
-};
-
-    const confirmOverwrite = () => {
-        executeUpload(overwriteModal.file, { overwrite: true });
-        setOverwriteModal({ isOpen: false, file: null, message: '' });
+        
+        // Tutup modal dan refresh
+        setBatchConflictModal({ isOpen: false, files: [], folderId: null, divisionId: null });
+        fetchFiles();
+        
+        // Tampilkan notifikasi hasil
+        if (successCount > 0) {
+            setNotification({ 
+                isOpen: true, 
+                message: `${successCount} file berhasil diunggah!${failCount > 0 ? ` ${failCount} file gagal.` : ''}`, 
+                type: successCount > 0 ? 'success' : 'error' 
+            });
+        } else if (failCount > 0) {
+            setNotification({ 
+                isOpen: true, 
+                message: `${failCount} file gagal diunggah.`, 
+                type: 'error' 
+            });
+        }
     };
 
     const closeNotification = () => {
@@ -617,21 +626,11 @@ const executeUpload = async (file, options = {}) => {
                 confirmText="Hapus Semua"
             />
 
-            <ConfirmationModal
-                isOpen={overwriteModal.isOpen}
-                onClose={() => setOverwriteModal({ isOpen: false, file: null, message: '' })}
-                onConfirm={confirmOverwrite}
-                message={overwriteModal.message || `File dengan nama "${overwriteModal.file?.name}" sudah ada. Timpa file?`}
-                confirmText="Timpa"
-                isDanger={true}
-                customActions={
-                    <button onClick={() => {
-                        setRenameUploadModal({ isOpen: true, file: overwriteModal.file, newName: '' });
-                        setOverwriteModal({ isOpen: false, file: null, message: '' });
-                    }} className="modal-button cancel-button">
-                        Ganti Nama
-                    </button>
-                }
+            <BatchConflictModal
+                isOpen={batchConflictModal.isOpen}
+                onClose={() => setBatchConflictModal({ isOpen: false, files: [], folderId: null, divisionId: null })}
+                conflictedFiles={batchConflictModal.files}
+                onResolve={handleBatchConflictResolve}
             />
 
             <Modal
@@ -656,34 +655,6 @@ const executeUpload = async (file, options = {}) => {
                         </button>
                         <button type="button" className="modal-button confirm-button" onClick={confirmRename}>
                             <FaSave /> Simpan
-                        </button>
-                    </div>
-                </div>
-            </Modal>
-
-            <Modal 
-                isOpen={renameUploadModal.isOpen} 
-                onClose={() => setRenameUploadModal({ ...renameUploadModal, isOpen: false })} 
-                title="Ganti Nama dan Upload"
-            >
-                <div>
-                    <p>File dengan nama ini sudah ada. Masukkan nama baru untuk mengunggah:</p>
-                    <input 
-                        type="text" 
-                        placeholder={`Nama asli: ${renameUploadModal.file?.name}`}
-                        value={renameUploadModal.newName}
-                        onChange={(e) => setRenameUploadModal({ ...renameUploadModal, newName: e.target.value })}
-                        className="form-input w-full mt-2"
-                    />
-                    <div className="confirmation-modal-actions">
-                        <button type="button" className="modal-button cancel-button" onClick={() => setRenameUploadModal({ ...renameUploadModal, isOpen: false })}>
-                            <FaTimes /> Batal
-                        </button>
-                        <button type="button" className="modal-button confirm-button" onClick={() => {
-                            executeUpload(renameUploadModal.file, { newName: renameUploadModal.newName });
-                            setRenameUploadModal({ isOpen: false, file: null, newName: '' });
-                        }}>
-                            <FaSave /> Simpan dan Upload
                         </button>
                     </div>
                 </div>

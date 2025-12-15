@@ -77,7 +77,7 @@ const FileUploadForm = ({ onUploadComplete, onConflict, onUploadError, currentFo
         setIsUploadModalOpen(true);
 
         let successfulUploads = 0;
-        let hasConflict = false;
+        const conflictedFiles = []; // Kumpulkan semua file yang conflict
 
         for (let i = 0; i < uploadQueue.length; i++) {
             let fileItem = uploadQueue[i];
@@ -124,18 +124,22 @@ const FileUploadForm = ({ onUploadComplete, onConflict, onUploadError, currentFo
                 if (err.name === 'AbortError') {
                     console.log(`Upload for ${fileItem.name} was canceled.`);
                 } else if (err.response && err.response.status === 409) {
-                    onConflict(fileItem.file, err.response.data.message);
-                    hasConflict = true;
+                    // Simpan file conflict untuk di-handle nanti
+                    conflictedFiles.push({
+                        file: fileItem.file,
+                        message: err.response.data.message,
+                        id: fileItem.id
+                    });
                     setUploadQueue(prevQueue =>
                         prevQueue.map(item =>
-                            item.id === fileItem.id ? { ...item, status: 'failed' } : item
+                            item.id === fileItem.id ? { ...item, status: 'conflict' } : item
                         )
                     );
                 } else {
                     if (onUploadError) {
                         onUploadError(err);
                     } else {
-                        setNotification({ isOpen: true, message: `Gagal mengunggah file ${fileItem.name}. Silakan coba lagi.`, type: 'error' });
+                        setNotification({ isOpen: true, message: `Gagal mengunggah file ${fileItem.file.name}. Silakan coba lagi.`, type: 'error' });
                     }
                     console.error(err);
                     setUploadQueue(prevQueue =>
@@ -146,15 +150,27 @@ const FileUploadForm = ({ onUploadComplete, onConflict, onUploadError, currentFo
                 }
             }
         }
+        
         setIsUploadModalOpen(false);
-        setUploadQueue([]);
-        if (successfulUploads > 0 && !hasConflict) {
-            setNotification({ isOpen: true, message: `${successfulUploads} file berhasil diunggah!`, type: 'success' });
-            onUploadComplete();
-        } else if (hasConflict) {
-            // onConflict would have handled the notification
-        } else if (successfulUploads === 0 && !hasConflict) {
-            setNotification({ isOpen: true, message: 'Tidak ada file yang berhasil diunggah.', type: 'error' });
+        
+        // Handle hasil upload
+        if (conflictedFiles.length > 0) {
+            // Kirim semua file yang conflict ke parent untuk di-handle
+            onConflict(conflictedFiles, currentFolderId, divisionId);
+            setUploadQueue([]); // Bersihkan queue setelah conflict di-handle
+        } else {
+            setUploadQueue([]); // Bersihkan queue jika tidak ada conflict
+            if (successfulUploads > 0) {
+                setNotification({ isOpen: true, message: `${successfulUploads} file berhasil diunggah!`, type: 'success' });
+                onUploadComplete();
+            } else {
+                setNotification({ isOpen: true, message: 'Tidak ada file yang berhasil diunggah.', type: 'error' });
+            }
+        }
+        
+        // Tampilkan notifikasi jika ada file sukses DAN conflict
+        if (successfulUploads > 0 && conflictedFiles.length > 0) {
+            setNotification({ isOpen: true, message: `${successfulUploads} file berhasil diunggah. ${conflictedFiles.length} file memerlukan konfirmasi.`, type: 'warning' });
         }
     };
     

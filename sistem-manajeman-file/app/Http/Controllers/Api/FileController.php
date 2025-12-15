@@ -108,6 +108,7 @@ public function store(Request $request)
     $originalName = $uploadedFile->getClientOriginalName();
     $newName = $request->input('new_name');
     $overwrite = $request->boolean('overwrite');
+    $autoRename = $request->boolean('auto_rename');
     $folderId = $request->input('folder_id');
 
     $user = Auth::user();
@@ -150,6 +151,11 @@ public function store(Request $request)
 
     // --- LOGIKA SIMPAN FILE ---
     $fileNameToSave = $newName ?: $originalName;
+
+    // Handle auto-rename (Windows-style)
+    if ($autoRename) {
+        $fileNameToSave = $this->getUniqueFileName($originalName, $divisionId, $folderId);
+    }
 
     $existingFile = File::where('nama_file_asli', $fileNameToSave)
         ->where('division_id', $divisionId)
@@ -321,5 +327,29 @@ public function store(Request $request)
         $this->authorize('delete', $file);
         $file->delete();
         return response()->json(['message' => 'File berhasil dipindahkan ke sampah.']);
+    }
+
+    /**
+     * Generate unique filename dengan pattern Windows (File.png → File(1).png → File(2).png)
+     */
+    private function getUniqueFileName($originalName, $divisionId, $folderId)
+    {
+        $pathInfo = pathinfo($originalName);
+        $baseName = $pathInfo['filename'];
+        $extension = isset($pathInfo['extension']) ? '.' . $pathInfo['extension'] : '';
+        
+        $counter = 1;
+        $newName = $originalName;
+        
+        while (File::where('nama_file_asli', $newName)
+            ->where('division_id', $divisionId)
+            ->where('folder_id', $folderId)
+            ->exists()) {
+            
+            $newName = $baseName . '(' . $counter . ')' . $extension;
+            $counter++;
+        }
+        
+        return $newName;
     }
 }

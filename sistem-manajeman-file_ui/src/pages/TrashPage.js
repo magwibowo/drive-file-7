@@ -8,8 +8,8 @@ import './DashboardView.css';
 import './TrashPage.css';
 
 // Impor komponen
-import Modal from '../components/Modal/Modal';
 import ConfirmationModal from '../components/ConfirmationModal/ConfirmationModal';
+import RestoreConflictModal from '../components/RestoreConflictModal/RestoreConflictModal';
 import Notification from '../components/Notification/Notification';
 import { FaTrash, FaUndo, FaSave, FaTimes } from 'react-icons/fa';
 
@@ -26,8 +26,7 @@ const TrashPage = () => {
 
     // State untuk modal konfirmasi
     const [deleteModal, setDeleteModal] = useState({ isOpen: false, file: null });
-    const [overwriteModal, setOverwriteModal] = useState({ isOpen: false, file: null, message: '' });
-    const [renameModal, setRenameModal] = useState({ isOpen: false, file: null, newName: '', extension: '' });
+    const [restoreConflictModal, setRestoreConflictModal] = useState({ isOpen: false, file: null, message: '' });
 
     const [notification, setNotification] = useState({ isOpen: false, message: '', type: '' });
 
@@ -138,58 +137,37 @@ const TrashPage = () => {
         executeRestore(file.id);
     };
 
-    const handleRename = () => {
-        const fileToRename = overwriteModal.file;
-        if (!fileToRename) return;
-
-        const originalName = fileToRename.nama_file_asli;
-        const lastDotIndex = originalName.lastIndexOf('.');
-        
-        let baseName = originalName;
-        let extension = '';
-
-        if (lastDotIndex > 0 && lastDotIndex < originalName.length - 1) {
-            baseName = originalName.substring(0, lastDotIndex);
-            extension = originalName.substring(lastDotIndex);
-        }
-
-        setRenameModal({ isOpen: true, file: fileToRename, newName: baseName, extension: extension });
-        setOverwriteModal({ isOpen: false, file: null, message: '' });
-    };
-
     const executeRestore = async (fileId, options = {}) => {
         try {
             await restoreFile(fileId, options);
             setNotification({ isOpen: true, message: 'File berhasil dipulihkan.', type: 'success' });
             fetchTrashedFiles();
-            setOverwriteModal({ isOpen: false, file: null, message: '' });
-            setRenameModal({ isOpen: false, file: null, newName: '', extension: '' });
+            setRestoreConflictModal({ isOpen: false, file: null, message: '' });
         } catch (error) {
             if (error.response && error.response.status === 409) {
                 const file = files.find(f => f.id === fileId);
-                setOverwriteModal({ isOpen: true, file: file, message: error.response.data.message });
+                setRestoreConflictModal({ isOpen: true, file: file, message: error.response.data.message });
             } else {
                 setNotification({ isOpen: true, message: 'Gagal memulihkan file.', type: 'error' });
-                setOverwriteModal({ isOpen: false, file: null, message: '' });
+                setRestoreConflictModal({ isOpen: false, file: null, message: '' });
             }
         }
     };
 
-    const confirmOverwrite = () => {
-        executeRestore(overwriteModal.file.id, { overwrite: true });
-    };
-
-    const confirmRename = () => {
-        if (!renameModal.newName.trim()) {
-            setNotification({ isOpen: true, message: 'Nama file tidak boleh kosong.', type: 'error' });
+    const handleRestoreConflictResolve = (action, newName) => {
+        if (action === 'skip') {
+            setRestoreConflictModal({ isOpen: false, file: null, message: '' });
             return;
         }
-        const finalNewName = renameModal.newName.trim() + renameModal.extension;
-        if (finalNewName === renameModal.file.nama_file_asli) {
-            setNotification({ isOpen: true, message: 'Nama file masih sama, silahkan diubah kembali.', type: 'error' });
-            return;
+        
+        const options = {};
+        if (action === 'overwrite') {
+            options.overwrite = true;
+        } else if (action === 'rename') {
+            options.newName = newName;
         }
-        executeRestore(renameModal.file.id, { newName: finalNewName });
+        
+        executeRestore(restoreConflictModal.file.id, options);
     };
 
     if (loading) return <div>Loading trashed files...</div>;
@@ -241,43 +219,13 @@ const TrashPage = () => {
                 confirmIcon={FaTrash}
             />
 
-            <ConfirmationModal
-                isOpen={overwriteModal.isOpen}
-                onClose={() => setOverwriteModal({ isOpen: false, file: null, message: '' })}
-                onConfirm={confirmOverwrite}
-                message={overwriteModal.message}
-                confirmText="Timpa File"
-                isDanger={true}
-                confirmIcon={FaSave}
-                customActions={
-                    <button onClick={handleRename} className="modal-button cancel-button">
-                        <FaUndo /> Ganti Nama & Pulihkan
-                    </button>
-                }
+            <RestoreConflictModal
+                isOpen={restoreConflictModal.isOpen}
+                onClose={() => setRestoreConflictModal({ isOpen: false, file: null, message: '' })}
+                file={restoreConflictModal.file}
+                message={restoreConflictModal.message}
+                onResolve={handleRestoreConflictResolve}
             />
-
-            <Modal isOpen={renameModal.isOpen} onClose={() => setRenameModal({ isOpen: false, file: null, newName: '', extension: '' })} title="Ganti Nama & Pulihkan">
-                <div>
-                    <p>File akan dipulihkan dengan nama baru:</p>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        <input 
-                            type="text" 
-                            value={renameModal.newName}
-                            onChange={(e) => setRenameModal({ ...renameModal, newName: e.target.value })}
-                            className="form-input w-full mt-2"
-                        />
-                        {renameModal.extension && <span className="file-extension mt-2">{renameModal.extension}</span>}
-                    </div>
-                    <div className="confirmation-modal-actions">
-                        <button type="button" className="modal-button cancel-button" onClick={() => setRenameModal({ isOpen: false, file: null, newName: '', extension: '' })}>
-                            <FaTimes /> Batal
-                        </button>
-                        <button type="button" className="modal-button confirm-button" onClick={confirmRename}>
-                            <FaSave /> Simpan dengan Nama Baru
-                        </button>
-                    </div>
-                </div>
-            </Modal>
 
             {notification.isOpen && (
                 <Notification
