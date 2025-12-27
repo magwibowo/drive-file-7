@@ -5,7 +5,8 @@ const apiClient = axios.create({
     baseURL: process.env.REACT_APP_API_URL || 'http://localhost:8000/api',
     headers: {
         'Accept': 'application/json',
-    }
+    },
+    timeout: 120000, // 2 minutes timeout for backup operations
 });
 
 // Interceptor untuk menambahkan token secara otomatis
@@ -86,43 +87,20 @@ export const downloadFile = (fileId) => apiClient.get(`/files/${fileId}`, { resp
 export const deleteFile = (fileId) => apiClient.delete(`/files/${fileId}`); // Soft delete
 
 
-// Ambil daftar backup
-export const fetchBackups = () => {
-  return apiClient.get("/backups"); // Gunakan endpoint jamak (plural)
-}
+// Backup Management
+export const fetchBackups = () => apiClient.get("/backups");
+export const createBackup = () => apiClient.post("/backups/run", {}, {
+    timeout: 120000, // 2 minutes for backup creation
+    headers: {
+        'Content-Type': 'application/json'
+    }
+});
+export const downloadBackup = (id) => apiClient.get(`/backups/${id}/download`, { responseType: "blob" });
+export const deleteBackup = (id) => apiClient.delete(`/backups/${id}`);
 
-// Jalankan backup manual
-export const createBackup = () => {
-  return apiClient.post("/backups/run");
-};
-
-// Download 
-//  berdasarkan ID
-// export const downloadBackup = (id) =>
-//   apiClient.get(`/
-// /download/${id}`, {
-//     responseType: "blob",
-//     headers: {
-//       "Cache-Control": "no-cache",
-//       "Pragma": "no-cache",
-//       "Accept": "application/zip",   // penting
-//       "Range": "bytes=0-",           // minta full file dari awal
-//     },
-//   });
-
-export const downloadBackup = (id) =>
-  apiClient.get(`/backups/${id}/download`, { responseType: "blob" });
-
-// export const downloadBackup = (id) => {
-//   return apiClient.get(`/backup/download/${id}`, {
-//     responseType: "blob",
-//   });
-// };
-
-// Hapus backup berdasarkan ID
-export const deleteBackup = (id) => {
-  return apiClient.delete(`/backups/${id}`); // Gunakan endpoint jamak (plural)
-};
+// NAS Health Check
+export const fetchNasHealth = () => apiClient.get("/nas/health");
+export const testNasWrite = () => apiClient.post("/nas/test-write");
 
 // Ambil setting backup
 export const fetchBackupSettings = async () => {
@@ -259,6 +237,45 @@ export const resetInactivityTimer = (onTimeout, onWarning) => {
 export const stopInactivityTimer = () => {
     clearTimeout(warningTimer);
     clearTimeout(inactivityTimer);
+};
+
+// --- NAS METRICS API --- //
+
+/**
+ * Test NAS connection
+ */
+export const testNasConnection = () => {
+    return apiClient.get('/admin/nas-metrics/test');
+};
+
+/**
+ * Poll latest NAS metrics (triggers new data collection)
+ */
+export const pollNasMetrics = () => {
+    return apiClient.post('/admin/nas-metrics/poll');
+};
+
+/**
+ * Get latest NAS metrics from database
+ */
+export const getLatestNasMetrics = () => {
+    return apiClient.get('/admin/nas-metrics/latest');
+};
+
+/**
+ * Get NAS metrics history
+ * @param {number} limit - Number of records to fetch (default: 100)
+ */
+export const getNasMetricsHistory = (limit = 100) => {
+    return apiClient.get(`/admin/nas-metrics/history?limit=${limit}`);
+};
+
+/**
+ * Get NAS metrics statistics
+ * @param {string} period - Time period: '1h', '24h', '7d', '30d' (default: '24h')
+ */
+export const getNasMetricsStats = (period = '24h') => {
+    return apiClient.get(`/admin/nas-metrics/stats?period=${period}`);
 };
 
 export default apiClient;

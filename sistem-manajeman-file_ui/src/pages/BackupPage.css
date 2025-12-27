@@ -5,18 +5,22 @@
   min-height: 100vh;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   color: #2c3e50;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 .page-title {
-  font-size: 1.9rem;
+  font-size: 2rem;
   font-weight: 700;
-  margin-bottom: 1.8rem;
+  margin-bottom: 1.5rem;
   display: flex;
   align-items: center;
+  color: #1a1a2e;
 }
 
 .page-title .icon {
   margin-right: 0.6rem;
+  font-size: 2rem;
 }
 
 /* Card */
@@ -26,6 +30,13 @@
   border-radius: 0.6rem;
   margin-bottom: 2rem;
   box-shadow: 0 3px 8px rgba(0,0,0,0.06);
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+  animation: fadeIn 0.3s ease-in;
+}
+
+.card:hover {
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
 }
 
 .card-header {
@@ -71,8 +82,14 @@
 /* Container utama untuk grid settings */
 .settings-grid-container {
   display: grid;
-  grid-template-columns: 1fr 2fr; /* Kolom jadwal lebih lebar */
+  grid-template-columns: 1fr 1.8fr; /* Kolom jadwal lebih lebar */
   gap: 1.5rem; /* Jarak antar card */
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* Card untuk setiap form di dalam grid */
@@ -83,7 +100,13 @@
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* Mendorong tombol ke bawah */
+  justify-content: space-between;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+  transition: box-shadow 0.3s ease;
+}
+
+.settings-form-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
 /* Wrapper untuk konten form agar tombol bisa didorong ke bawah */
@@ -110,6 +133,34 @@
 @media (max-width: 992px) {
   .settings-grid-container {
     grid-template-columns: 1fr;
+  }
+  
+  .backup-page {
+    padding: 1rem;
+  }
+  
+  .page-title {
+    font-size: 1.5rem;
+  }
+  
+  .card-body {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .backup-table table {
+    font-size: 0.85rem;
+  }
+  
+  .backup-table th,
+  .backup-table td {
+    padding: 0.5rem;
+  }
+  
+  .btn {
+    font-size: 0.8rem;
+    padding: 0.5rem 0.8rem;
   }
 }
 
@@ -138,21 +189,44 @@
   background-color: #fafbfc;
 }
 
+.backup-table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
 .backup-table tbody tr:hover {
-  background-color: #eef4fb;
+  background-color: #e3f2fd;
+  cursor: default;
 }
 
 /* Buttons */
 .btn {
-  padding: 0.6rem 1.2rem; /* Sedikit lebih besar agar nyaman */
-  border-radius: 0.3rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 0.4rem;
   font-size: 0.9rem;
   font-weight: 600;
   border: none;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s ease;
   margin-right: 0.4rem;
-  align-self: flex-start; /* Tombol align ke kiri di dalam card */
+  align-self: flex-start;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.btn:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .btn:last-child {

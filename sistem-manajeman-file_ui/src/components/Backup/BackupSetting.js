@@ -126,7 +126,7 @@ export default function BackupSetting() {
         {/* Kolom 1: Form Path */}
         <form onSubmit={handlePathSubmit} className="settings-form-card">
           <div className="form-content">
-            <h4>Lokasi Penyimpanan</h4>
+            <h4>📁 Lokasi Penyimpanan</h4>
             <p className="form-description">
               Tentukan direktori folder untuk menyimpan file backup.
             </p>
@@ -137,20 +137,34 @@ export default function BackupSetting() {
                 value={backupPath}
                 onChange={(e) => setBackupPath(e.target.value)}
                 className="form-input"
-                placeholder="Contoh: D:\\backups"
+                placeholder="Contoh: Z:\\backups atau D:\\backups"
                 required
               />
+              <small style={{ marginTop: '4px', color: '#6c757d', fontSize: '12px' }}>
+                💡 Gunakan format Windows: Z:\\backups (dengan double backslash)
+              </small>
             </div>
+            {backupPath && (
+              <div style={{ 
+                padding: '10px', 
+                backgroundColor: '#e7f3ff', 
+                borderRadius: '4px',
+                fontSize: '13px',
+                marginTop: '10px'
+              }}>
+                ℹ️ Path saat ini: <strong>{backupPath}</strong>
+              </div>
+            )}
           </div>
           <button type="submit" disabled={loading} className="btn btn-primary">
-            {loading ? "Menyimpan..." : "Simpan Path"}
+            {loading ? "⏳ Menyimpan..." : "💾 Simpan Path"}
           </button>
         </form>
 
         {/* Kolom 2: Form Jadwal */}
         <form onSubmit={handleScheduleSubmit} className="settings-form-card">
           <div className="form-content">
-            <h4>Jadwal Otatis</h4>
+            <h4>⏰ Jadwal Otomatis</h4>
             <p className="form-description">
               Atur frekuensi backup otomatis sesuai kebutuhan Anda.
             </p>
@@ -256,8 +270,22 @@ export default function BackupSetting() {
             </>
           )}
           </div>
+          {schedule !== 'off' && time && (
+            <div style={{ 
+              padding: '10px', 
+              backgroundColor: '#d4edda', 
+              borderRadius: '4px',
+              fontSize: '13px',
+              marginBottom: '15px',
+              border: '1px solid #c3e6cb'
+            }}>
+              ✅ Jadwal Aktif: {schedule === 'daily' ? 'Setiap hari' : 
+                              schedule === 'weekly' ? 'Setiap minggu' :
+                              schedule === 'monthly' ? 'Setiap bulan' : 'Setiap tahun'} pukul <strong>{time}</strong>
+            </div>
+          )}
           <button type="submit" disabled={loading} className="btn btn-primary">
-            {loading ? "Menyimpan..." : "Simpan Jadwal"}
+            {loading ? "⏳ Menyimpan..." : "💾 Simpan Jadwal"}
           </button>
         </form>
       </div>

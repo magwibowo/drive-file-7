@@ -170,7 +170,7 @@ public function store(Request $request)
     }
 
     if ($existingFile && $overwrite) {
-        Storage::delete($existingFile->path_penyimpanan);
+        Storage::disk('nas_uploads')->delete($existingFile->path_penyimpanan);
         $existingFile->forceDelete();
     }
 
@@ -186,7 +186,7 @@ public function store(Request $request)
         }
     }
 
-    $path = $uploadedFile->store($uploadPath);
+    $path = $uploadedFile->store($uploadPath, 'nas_uploads');
 
     $newFile = File::create([
         'nama_file_asli' => $fileNameToSave,
@@ -279,7 +279,7 @@ public function store(Request $request)
         }
 
         if ($existingActiveFile && $overwrite) {
-            Storage::delete($existingActiveFile->path_penyimpanan);
+            Storage::disk('nas_uploads')->delete($existingActiveFile->path_penyimpanan);
             $existingActiveFile->forceDelete();
         }
         
@@ -297,7 +297,7 @@ public function store(Request $request)
     {
         $file = File::onlyTrashed()->findOrFail($fileId);
         $this->authorize('forceDelete', $file);
-        Storage::delete($file->path_penyimpanan);
+        Storage::disk('nas_uploads')->delete($file->path_penyimpanan);
         $file->forceDelete();
         return response()->json(['message' => 'File berhasil dihapus permanen.']);
     }
@@ -307,7 +307,7 @@ public function store(Request $request)
         $file = File::withTrashed()->findOrFail($fileId);
         $this->authorize('view', $file);
 
-        if (!Storage::exists($file->path_penyimpanan)) {
+        if (!Storage::disk('nas_uploads')->exists($file->path_penyimpanan)) {
             return response()->json(['message' => 'File tidak ditemukan di server.'], 404);
         }
 
@@ -315,10 +315,10 @@ public function store(Request $request)
         $textMimeTypes = ['text/plain', 'application/pdf'];
 
         if (in_array($file->tipe_file, $imageMimeTypes) || in_array($file->tipe_file, $textMimeTypes)) {
-            return Storage::response($file->path_penyimpanan, $file->nama_file_asli);
+            return Storage::disk('nas_uploads')->response($file->path_penyimpanan, $file->nama_file_asli);
         }
 
-        return Storage::download($file->path_penyimpanan, $file->nama_file_asli);
+        return Storage::disk('nas_uploads')->download($file->path_penyimpanan, $file->nama_file_asli);
     }
 
     public function destroy($fileId)

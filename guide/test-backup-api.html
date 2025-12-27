@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Backup API</title>
+</head>
+<body>
+    <h1>Test Backup API</h1>
+    
+    <h2>1. Get Backups</h2>
+    <button onclick="testGetBackups()">GET /api/backups</button>
+    <pre id="backups-result"></pre>
+    
+    <h2>2. Create Manual Backup</h2>
+    <button onclick="testCreateBackup()">POST /api/backups/run</button>
+    <pre id="create-result"></pre>
+    
+    <h2>3. Get Settings</h2>
+    <button onclick="testGetSettings()">GET /api/backups/settings</button>
+    <pre id="settings-result"></pre>
+    
+    <h2>4. Get Schedule</h2>
+    <button onclick="testGetSchedule()">GET /api/backups/schedule</button>
+    <pre id="schedule-result"></pre>
+    
+    <script>
+        const API_URL = 'http://localhost:8000/api';
+        const TOKEN = localStorage.getItem('auth_token'); // Get from localStorage
+        
+        console.log('Auth Token:', TOKEN);
+        
+        async function testGetBackups() {
+            try {
+                const response = await fetch(`${API_URL}/backups`, {
+                    headers: {
+                        'Authorization': `Bearer ${TOKEN}`,
+                        'Accept': 'application/json'
+                    }
+                });
+                const data = await response.json();
+                document.getElementById('backups-result').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('backups-result').textContent = 'Error: ' + error.message;
+            }
+        }
+        
+        async function testCreateBackup() {
+            document.getElementById('create-result').textContent = 'Creating backup...';
+            try {
+                const response = await fetch(`${API_URL}/backups/run`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${TOKEN}`,
+                        'Accept': 'application/json'
+                    }
+                });
+                const data = await response.json();
+                document.getElementById('create-result').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('create-result').textContent = 'Error: ' + error.message;
+            }
+        }
+        
+        async function testGetSettings() {
+            try {
+                const response = await fetch(`${API_URL}/backups/settings`, {
+                    headers: {
+                        'Authorization': `Bearer ${TOKEN}`,
+                        'Accept': 'application/json'
+                    }
+                });
+                const data = await response.json();
+                document.getElementById('settings-result').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('settings-result').textContent = 'Error: ' + error.message;
+            }
+        }
+        
+        async function testGetSchedule() {
+            try {
+                const response = await fetch(`${API_URL}/backups/schedule`, {
+                    headers: {
+                        'Authorization': `Bearer ${TOKEN}`,
+                        'Accept': 'application/json'
+                    }
+                });
+                const data = await response.json();
+                document.getElementById('schedule-result').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('schedule-result').textContent = 'Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>

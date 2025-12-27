@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import BackupToolbar from "../components/Backup/BackupToolbar";
-import BackupSettings from "../components/Backup/BackupSetting";
+import BackupSetting from "../components/Backup/BackupSetting";
 import BackupTable from "../components/Backup/BackupTable";
+import NasHealthIndicator from "../components/Backup/NasHealthIndicator";
+import BackupProgress from "../components/Backup/BackupProgress";
 import "../pages/BackupPage.css";
 import {
   fetchBackups,
@@ -19,8 +21,7 @@ export default function BackupPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
 
-  // --- PENAMBAHAN ---
-  // 2. State untuk mengelola notifikasi
+  // State untuk mengelola notifikasi
   const [notification, setNotification] = useState({
     visible: false,
     message: "",
@@ -50,22 +51,55 @@ export default function BackupPage() {
   const handleBackup = async () => {
     setIsCreatingBackup(true);
     try {
-      await createBackup();
+      const response = await createBackup();
+      console.log('Backup Response:', response); // Debug log
+      
       await loadBackups();
-      // --- PERUBAHAN ---
-      // Menampilkan notifikasi sukses
+      
+      // Success notification dengan detail
+      // Backend returns: { message: "...", file: "Z:\\backups\\backup_xxx.zip" }
+      const fullPath = response.data?.file || response.data?.path || '';
+      const filename = fullPath.split('\\').pop() || fullPath.split('/').pop() || 'backup.zip';
+      
       setNotification({
         visible: true,
-        message: "Backup manual berhasil dibuat.",
+        message: `✅ Backup berhasil dibuat: ${filename}`,
         type: "success",
       });
     } catch (error) {
-      console.error("Gagal membuat backup:", error);
-      // --- PERUBAHAN ---
-      // Menampilkan notifikasi error
+      // Better error messages
+      console.error("Backup error details:", {
+        response: error.response,
+        message: error.message,
+        data: error.response?.data
+      });
+      
+      let errorMessage = "Gagal membuat backup. ";
+      
+      if (error.response?.data?.message) {
+        // Use backend message directly
+        errorMessage = error.response.data.message;
+      } else if (error.response?.data?.error) {
+        // Parse backend error
+        const backendError = error.response.data.error;
+        if (backendError.includes('mysqldump') || backendError.includes('dump')) {
+          errorMessage += "Database backup gagal. Periksa koneksi MySQL.";
+        } else if (backendError.includes('ZIP') || backendError.includes('zip')) {
+          errorMessage += "Gagal membuat file ZIP.";
+        } else if (backendError.includes('permission') || backendError.includes('Permission')) {
+          errorMessage += "Tidak ada akses ke folder backup.";
+        } else {
+          errorMessage += backendError;
+        }
+      } else if (error.message === 'Network Error') {
+        errorMessage += "Tidak dapat terhubung ke server.";
+      } else {
+        errorMessage += error.message || "Silakan coba lagi.";
+      }
+      
       setNotification({
         visible: true,
-        message: "Gagal membuat backup manual.",
+        message: errorMessage,
         type: "error",
       });
     } finally {
@@ -134,8 +168,10 @@ export default function BackupPage() {
   return (
     // Kita tambahkan div wrapper agar notifikasi bisa ditampilkan di atas segalanya
     <>
-      {/* --- PENAMBAHAN --- */}
-      {/* 3. Render komponen notifikasi secara kondisional */}
+      {/* Progress Indicator Modal */}
+      <BackupProgress isCreating={isCreatingBackup} message="Sedang membuat backup..." />
+
+      {/* Notification */}
       {notification.visible && (
         <Notification
           message={notification.message}
@@ -146,8 +182,11 @@ export default function BackupPage() {
 
       <div className="backup-page">
         <h2 className="page-title">
-          <span className="icon"></span> Manajemen Backup
+          <span className="icon">💾</span> Manajemen Backup
         </h2>
+
+        {/* NAS Health Indicator - Shows drive status and health */}
+        <NasHealthIndicator />
 
         <div className="toolbar-container">
           <BackupToolbar onBackup={handleBackup} loading={isCreatingBackup} />
@@ -155,28 +194,39 @@ export default function BackupPage() {
 
         <div className="card">
           <div className="card-header">
-            <span className="icon">⚙️</span> Pengaturan Backup
+            <span className="icon">🗂️</span> Daftar Backup ({backups.length})
           </div>
           <div className="card-body">
-            <BackupSettings />
+            {backups.length === 0 && !loading ? (
+              <div style={{ 
+                textAlign: 'center', 
+                padding: '40px 20px',
+                color: '#666',
+                fontSize: '15px'
+              }}>
+                📦 Belum ada backup. Klik tombol "Buat Backup Manual" untuk membuat backup pertama.
+              </div>
+            ) : (
+              <BackupTable
+                backups={currentItems} 
+                loading={loading}
+                onDownload={handleDownload}
+                onDelete={handleDelete}
+                itemsPerPage={itemsPerPage}
+                totalBackups={backups.length}
+                paginate={paginate}
+                currentPage={currentPage}
+              />
+            )}
           </div>
         </div>
 
         <div className="card">
           <div className="card-header">
-            <span className="icon">🗂️</span> Daftar Backup
+            <span className="icon">⚙️</span> Pengaturan Backup
           </div>
           <div className="card-body">
-            <BackupTable
-              backups={currentItems} 
-              loading={loading}
-              onDownload={handleDownload}
-              onDelete={handleDelete}
-              itemsPerPage={itemsPerPage}
-              totalBackups={backups.length}
-              paginate={paginate}
-              currentPage={currentPage}
-            />
+            <BackupSetting />
           </div>
         </div>
       </div>

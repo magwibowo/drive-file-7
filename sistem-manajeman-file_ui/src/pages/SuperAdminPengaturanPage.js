@@ -3,6 +3,7 @@ import { useState } from "react";
 import BackupPage from "./BackupPage";
 import DivisionQuotaPage from "./DivisionQuotaPage";
 import ServerMonitor from "../components/ServerMonitor/ServerMonitor";
+import NasMonitorDashboard from "../components/NasMonitor/NasMonitorDashboard";
 import "./SuperAdminPengaturanPage.css";
 
 export default function SuperAdminPengaturanPage() {
@@ -39,6 +40,12 @@ export default function SuperAdminPengaturanPage() {
         >
           Server Monitor
         </button>
+        <button
+          className={`tab-btn ${activeTab === "nas" ? "active" : ""}`}
+          onClick={() => setActiveTab("nas")}
+        >
+          NAS Monitor
+        </button>
       </div>
 
       {/* Isi Konten yang sudah digabung */}
@@ -57,6 +64,9 @@ export default function SuperAdminPengaturanPage() {
 
         {/* Tab Server Monitor */}
         {activeTab === "monitor" && <ServerMonitor />}
+
+        {/* Tab NAS Monitor */}
+        {activeTab === "nas" && <NasMonitorDashboard />}
       </div>
     </div>
   );

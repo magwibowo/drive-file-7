@@ -50,6 +50,40 @@ return [
             'throw' => false,
         ],
 
+        // NAS Storage Configuration
+        'nas' => [
+            'driver' => 'local',
+            'root' => env('NAS_DRIVE_PATH', 'Z:\\'),
+            'url' => env('APP_URL').'/nas',
+            'visibility' => 'private',
+            'throw' => false,
+            'permissions' => [
+                'file' => [
+                    'public' => 0644,
+                    'private' => 0600,
+                ],
+                'dir' => [
+                    'public' => 0755,
+                    'private' => 0700,
+                ],
+            ],
+        ],
+
+        'nas_uploads' => [
+            'driver' => 'local',
+            'root' => env('NAS_DRIVE_PATH', 'Z:\\').'uploads',
+            'url' => env('APP_URL').'/nas/uploads',
+            'visibility' => 'public',
+            'throw' => false,
+        ],
+
+        'nas_backups' => [
+            'driver' => 'local',
+            'root' => env('NAS_DRIVE_PATH', 'Z:\\').'backups',
+            'visibility' => 'private',
+            'throw' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

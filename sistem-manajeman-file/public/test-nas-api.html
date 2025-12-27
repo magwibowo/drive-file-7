@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NAS API Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <h1>NAS Metrics API Test</h1>
+    <button onclick="testAPI()">Test Latest API</button>
+    <button onclick="testPoll()">Test Poll API</button>
+    <pre id="output"></pre>
+
+    <script>
+        const apiBaseUrl = 'http://localhost/drive-file-7/sistem-manajeman-file/public/api/admin/nas-metrics';
+        const token = localStorage.getItem('authToken');
+
+        async function testAPI() {
+            const output = document.getElementById('output');
+            output.textContent = 'Loading...';
+            
+            try {
+                const response = await axios.get(apiBaseUrl + '/latest', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                output.textContent = JSON.stringify(response.data, null, 2);
+            } catch (error) {
+                output.textContent = 'Error: ' + error.message + '\n\n' + JSON.stringify(error.response?.data, null, 2);
+            }
+        }
+
+        async function testPoll() {
+            const output = document.getElementById('output');
+            output.textContent = 'Loading...';
+            
+            try {
+                const response = await axios.post(apiBaseUrl + '/poll', {}, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                output.textContent = JSON.stringify(response.data, null, 2);
+            } catch (error) {
+                output.textContent = 'Error: ' + error.message + '\n\n' + JSON.stringify(error.response?.data, null, 2);
+            }
+        }
+
+        console.log('Auth Token:', token);
+    </script>
+</body>
+</html>

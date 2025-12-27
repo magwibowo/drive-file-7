@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test NAS Upload via API</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+        .result { margin-top: 20px; padding: 15px; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button { padding: 10px 20px; margin: 10px 0; cursor: pointer; background-color: #007bff; color: white; border: none; border-radius: 5px; }
+        button:hover { background-color: #0056b3; }
+        input[type="file"] { margin: 10px 0; }
+        pre { background-color: #f4f4f4; padding: 10px; border-radius: 5px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Test NAS Upload Storage via API</h1>
+    
+    <div>
+        <label>API Token (dari localStorage atau manual):</label><br>
+        <input type="text" id="token" style="width: 100%; padding: 8px; margin: 10px 0;" placeholder="Bearer token...">
+        <button onclick="loadTokenFromLocalStorage()">Load dari LocalStorage</button>
+    </div>
+
+    <div style="margin-top: 20px;">
+        <label>Select File to Upload:</label><br>
+        <input type="file" id="fileInput">
+    </div>
+
+    <div>
+        <label>Division ID (optional, untuk super_admin):</label><br>
+        <input type="number" id="divisionId" style="padding: 8px; margin: 10px 0;" placeholder="Leave empty for own division">
+    </div>
+
+    <button onclick="uploadFile()">Upload to NAS</button>
+    <button onclick="checkNasStorage()">Check Z:\uploads Content</button>
+
+    <div id="result"></div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000/api';
+
+        function loadTokenFromLocalStorage() {
+            const token = localStorage.getItem('authToken');
+            if (token) {
+                document.getElementById('token').value = token;
+                showResult('Token loaded from localStorage', 'success');
+            } else {
+                showResult('No token found in localStorage. Please login first.', 'error');
+            }
+        }
+
+        async function uploadFile() {
+            const token = document.getElementById('token').value;
+            const fileInput = document.getElementById('fileInput');
+            const divisionId = document.getElementById('divisionId').value;
+
+            if (!token) {
+                showResult('Please provide API token', 'error');
+                return;
+            }
+
+            if (!fileInput.files || fileInput.files.length === 0) {
+                showResult('Please select a file', 'error');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            if (divisionId) {
+                formData.append('division_id', divisionId);
+            }
+
+            try {
+                showResult('Uploading to NAS...', 'info');
+
+                const response = await fetch(`${API_BASE}/files`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/json'
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showResult(
+                        `✅ Upload SUCCESS!<br><br>` +
+                        `<strong>File:</strong> ${data.file.nama_file_asli}<br>` +
+                        `<strong>Path:</strong> ${data.file.path_penyimpanan}<br>` +
+                        `<strong>Size:</strong> ${(data.file.ukuran_file / 1024).toFixed(2)} KB<br>` +
+                        `<strong>Type:</strong> ${data.file.tipe_file}<br>` +
+                        `<strong>Division:</strong> ${data.file.division_id}<br><br>` +
+                        `<pre>${JSON.stringify(data, null, 2)}</pre>`,
+                        'success'
+                    );
+                } else {
+                    showResult(
+                        `❌ Upload FAILED<br><br>` +
+                        `<pre>${JSON.stringify(data, null, 2)}</pre>`,
+                        'error'
+                    );
+                }
+            } catch (error) {
+                showResult(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function checkNasStorage() {
+            showResult('Checking NAS storage is a server-side operation. Please run: <code>Get-ChildItem Z:\\uploads -Recurse</code> in PowerShell', 'info');
+        }
+
+        function showResult(message, type) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = `result ${type}`;
+            resultDiv.innerHTML = message;
+        }
+
+        // Auto-load token on page load
+        window.onload = function() {
+            loadTokenFromLocalStorage();
+        }
+    </script>
+</body>
+</html>

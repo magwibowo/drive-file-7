@@ -27,7 +27,6 @@ import DivisionActivityLogPage from './pages/DivisionActivityLogPage';
 import SuperAdminLayout from './components/Layout/SuperAdminLayout';
 import SuperAdminBeranda from './pages/SuperAdminBeranda';
 import SuperAdminPengaturanPage from './pages/SuperAdminPengaturanPage';
-import SuperAdminBackupPage from './pages/SuperAdminBackupPage';
 import ManajemenPage from './pages/ManajemenPage'; 
 import KelolaDivisiPage from './pages/KelolaDivisiPage';
 import KelolaPenggunaPage from './pages/KelolaPenggunaPage'; 
@@ -178,8 +177,7 @@ function App() {
                 <Route path="kelola-folder-divisi" element={<PilihDivisiPage />} />
                 <Route path="kelola-folder/divisi/:divisionId" element={<KelolaFolderPage />} />
 
-                {/* Dari feature/backup-fix */}
-                <Route path="pengaturan/backup" element={<SuperAdminBackupPage />} />
+                {/* Pengaturan - includes Backup Data tab (BackupPage integrated) */}
                 <Route path="pengaturan" element={<SuperAdminPengaturanPage />} />
 
                 <Route path="*" element={<Navigate to="beranda" replace />} />

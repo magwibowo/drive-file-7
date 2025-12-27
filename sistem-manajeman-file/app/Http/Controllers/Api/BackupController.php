@@ -55,9 +55,10 @@ class BackupController extends Controller
     public function getSettings(): JsonResponse
     {
         $setting = BackupSetting::first();
+        $defaultPath = env('NAS_DRIVE_PATH', 'Z:\\') . 'backups';
         return response()->json([
             'status' => 'success',
-            'backup_path' => $setting ? $setting->backup_path : storage_path('app/backups')
+            'backup_path' => $setting ? $setting->backup_path : $defaultPath
         ]);
     }
 
@@ -91,103 +92,63 @@ class BackupController extends Controller
 
 public function run(Request $request)
 {
-    // ambil path target dari DB (dinamis dari frontend)
-    $setting = BackupSetting::first();
-    $backupPath = $setting ? trim($setting->backup_path, "\" \t\n\r\0\x0B") : storage_path('app/backups');
-
-    if (!file_exists($backupPath)) {
-        if (!mkdir($backupPath, 0755, true) && !is_dir($backupPath)) {
-            return response()->json(['message' => 'Gagal membuat folder backup: ' . $backupPath], 500);
-        }
-    }
-
-    // Siapkan nama file zip dan temp file SQL
-    $timestamp = date('Ymd_His');
-    $zipFilename = 'backup_' . $timestamp . '.zip';
-    $zipFilePath = rtrim($backupPath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $zipFilename;
-    $dbDumpFile  = storage_path('app/db-backup-' . $timestamp . '.sql');
-
-    // --- 1) Ambil konfigurasi DB secara aman ---
-    $connection = config('database.default');
-    $dbConfig = config("database.connections.{$connection}");
-
-    if (empty($dbConfig['database']) || empty($dbConfig['username'])) {
-        return response()->json(['message' => 'Konfigurasi database tidak lengkap. Periksa DB_DATABASE & DB_USERNAME di .env'], 500);
-    }
-
-    // --- 2) Dump DB pakai Spatie DbDumper ---
+    // SOLUSI ULTIMATE: Execute artisan command di process terpisah (CLI context)
+    // Ini memastikan environment sama persis dengan menjalankan langsung di terminal
     try {
-        $dumper = MySql::create()
-            ->setDbName($dbConfig['database'])
-            ->setUserName($dbConfig['username'])
-            ->setPassword($dbConfig['password'] ?? '');
-
-        // host/port
-        if (!empty($dbConfig['host'])) {
-            $dumper->setHost($dbConfig['host']);
-        }
-        if (!empty($dbConfig['port'])) {
-            // Spatie DbDumper biasanya autodetect port via --port flag; but setHost already supports host:port not needed
-            $dumper->setPort($dbConfig['port']);
-        }
-        if (!empty(env('MYSQL_DUMP_PATH'))) {
-            // pastikan path berakhir dengan slash
-            $dumpPath = rtrim(env('MYSQL_DUMP_PATH'), '/\\') . DIRECTORY_SEPARATOR;
-            $dumper->setDumpBinaryPath($dumpPath);
-        }
-        // if (!empty(env('DB_DUMP_PATH'))) {
-        //     $dumpPath = rtrim(env('DB_DUMP_PATH'), '/\\') . DIRECTORY_SEPARATOR;
-        //     $dumper->setDumpBinaryPath($dumpPath);
-        // }
-
-        $dumper->dumpToFile($dbDumpFile);
-
-        if (!file_exists($dbDumpFile)) {
-            Log::error("DB dump tidak menghasilkan file: {$dbDumpFile}");
-            return response()->json(['message' => 'Gagal membuat dump database. Periksa log.'], 500);
+        Log::info('Manual backup triggered from HTTP request');
+        
+        // Get PHP binary path
+        $phpBinary = PHP_BINARY; // Full path ke php.exe
+        $artisanPath = base_path('artisan');
+        
+        // Build command
+        $command = sprintf('"%s" "%s" backup:run 2>&1', $phpBinary, $artisanPath);
+        
+        Log::info('Executing backup command', ['command' => $command]);
+        
+        // Execute command dan tangkap output
+        $output = [];
+        $exitCode = 0;
+        exec($command, $output, $exitCode);
+        
+        $outputString = implode("\n", $output);
+        
+        Log::info('Backup command completed', [
+            'exit_code' => $exitCode,
+            'output' => $outputString
+        ]);
+        
+        if ($exitCode === 0) {
+            // Ambil backup terbaru
+            $latestBackup = Backup::latest()->first();
+            
+            return response()->json([
+                'message' => 'Backup berhasil dibuat',
+                'file' => $latestBackup->path ?? 'N/A',
+                'filename' => $latestBackup->filename ?? 'N/A',
+            ]);
+        } else {
+            Log::error('Backup command failed', [
+                'exit_code' => $exitCode,
+                'output' => $outputString
+            ]);
+            
+            return response()->json([
+                'message' => 'Backup gagal. Periksa log untuk detail.',
+                'error' => $outputString
+            ], 500);
         }
     } catch (\Throwable $e) {
-        Log::error('DB dump error: '.$e->getMessage());
-        return response()->json(['message' => 'Gagal dump database', 'error' => $e->getMessage()], 500);
+        Log::error('Error executing backup command', [
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
+        
+        return response()->json([
+            'message' => 'Terjadi kesalahan saat backup',
+            'error' => $e->getMessage()
+        ], 500);
     }
-
-    // --- 3) Buat ZIP dan masukkan dump + folder uploads ---
-    $zip = new ZipArchive();
-    if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
-        return response()->json(['message' => 'Tidak bisa membuat file ZIP di path: '.$zipFilePath], 500);
-    }
-
-    // masukkan dump db ke folder database-dumps/
-    $zip->addFile($dbDumpFile, 'database-dumps/' . basename($dbDumpFile));
-
-    // masukkan folder storage/app/uploads sebagai storage/app/uploads
-    $uploadsPath = storage_path('app/uploads');
-    if (is_dir($uploadsPath)) {
-        $this->addFolderToZip($uploadsPath, $zip, 'storage/app/uploads');
-    }
-
-    // jika ingin tambahkan folder lain, cek dan tambahkan di sini
-    // ex: $this->addFolderToZip(public_path('uploads'), $zip, 'public/uploads');
-
-    $zip->close();
-
-    // hapus file sql sementara
-    if (file_exists($dbDumpFile)) {
-        @unlink($dbDumpFile);
-    }
-
-    // simpan metadata ke DB
-    Backup::create([
-        'filename' => $zipFilename,
-        'path'     => $zipFilePath,
-        'schedule' => 'manual',
-        'size'     => filesize($zipFilePath),
-    ]);
-
-    return response()->json([
-        'message' => 'Backup berhasil dibuat',
-        'file' => $zipFilePath,
-    ]);
 }
 
 /**

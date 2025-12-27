@@ -74,7 +74,11 @@ export default function BackupTable({
         <tbody>
           {loading ? (
             <tr>
-              <td colSpan="4" style={{ textAlign: "center" }}>Memuat data...</td>
+              <td colSpan="4" style={{ textAlign: "center", padding: '40px' }}>
+                <div style={{ fontSize: '16px', color: '#666' }}>
+                  ⏳ Memuat data backup...
+                </div>
+              </td>
             </tr>
           ) : backups.length > 0 ? (
             backups.map((backup) => (
@@ -83,25 +87,46 @@ export default function BackupTable({
                 <td>{formatSize(backup.size)}</td>
                 <td>{formatDate(backup.created_at)}</td>
                 <td>
-                  <button
-                    className="btn btn-success"
-                    onClick={() => onDownload(backup.id)}
-                  >
-                    ⬇️ Download
-                  </button>
-                  <button
-                    className="btn btn-danger"
-                    onClick={() => onDelete(backup.id)}
-                  >
-                    🗑️ Hapus
-                  </button>
+                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-start' }}>
+                    <button
+                      className="btn btn-success"
+                      onClick={() => onDownload(backup.id)}
+                      style={{ 
+                        fontSize: '13px', 
+                        padding: '6px 12px',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}
+                    >
+                      ⬇️ Download
+                    </button>
+                    <button
+                      className="btn btn-danger"
+                      onClick={() => onDelete(backup.id)}
+                      style={{ 
+                        fontSize: '13px', 
+                        padding: '6px 12px',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}
+                    >
+                      🗑️ Hapus
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan="4" style={{ textAlign: "center" }}>
-                Belum ada backup tersedia
+              <td colSpan="4" style={{ textAlign: "center", padding: '60px 20px' }}>
+                <div style={{ color: '#999', fontSize: '15px' }}>
+                  📦 Tidak ada data backup
+                </div>
+                <div style={{ color: '#aaa', fontSize: '13px', marginTop: '8px' }}>
+                  Klik tombol "Buat Backup Manual" untuk membuat backup pertama
+                </div>
               </td>
             </tr>
           )}

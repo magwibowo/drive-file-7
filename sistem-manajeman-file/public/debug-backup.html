@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Backup Button</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        button { 
+            padding: 10px 20px; 
+            font-size: 16px; 
+            cursor: pointer; 
+            margin: 10px 0;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        pre { 
+            background: #f4f4f4; 
+            padding: 10px; 
+            border-radius: 5px;
+            max-height: 400px;
+            overflow: auto;
+        }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        input { padding: 8px; width: 400px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Debug Backup Button</h1>
+    
+    <div>
+        <h3>Step 1: Login</h3>
+        <input type="text" id="login" value="admin@contoh.com" placeholder="Email/Login">
+        <input type="password" id="password" value="password" placeholder="Password">
+        <button onclick="doLogin()">Login</button>
+        <pre id="login-result"></pre>
+    </div>
+    
+    <div>
+        <h3>Step 2: Test Backup API</h3>
+        <button onclick="testGetBackups()" id="btn-get">GET /api/backups</button>
+        <button onclick="testCreateBackup()" id="btn-create">POST /api/backups/run (Create Backup)</button>
+        <pre id="api-result"></pre>
+    </div>
+    
+    <div>
+        <h3>Debug Info</h3>
+        <pre id="debug-info"></pre>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000/api';
+        let authToken = localStorage.getItem('authToken');
+        
+        function log(elementId, message, type = 'info') {
+            const el = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'success' ? 'green' : type === 'error' ? 'red' : 'blue';
+            el.innerHTML += `<span style="color: ${color}">[${timestamp}] ${message}</span>\n`;
+            el.scrollTop = el.scrollHeight;
+        }
+        
+        function updateDebugInfo() {
+            const debug = document.getElementById('debug-info');
+            debug.textContent = `Auth Token: ${authToken ? authToken.substring(0, 30) + '...' : 'NOT SET'}
+API Base URL: ${API_URL}
+Current Time: ${new Date().toLocaleString()}`;
+        }
+        
+        updateDebugInfo();
+        
+        async function doLogin() {
+            const login = document.getElementById('login').value;
+            const password = document.getElementById('password').value;
+            const resultEl = document.getElementById('login-result');
+            resultEl.innerHTML = '';
+            
+            log('login-result', '🔄 Logging in...', 'info');
+            
+            try {
+                const response = await fetch(`${API_URL}/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ login, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.access_token) {
+                    authToken = data.access_token;
+                    localStorage.setItem('authToken', authToken);
+                    log('login-result', `✅ Login successful!`, 'success');
+                    log('login-result', `Token: ${authToken.substring(0, 40)}...`, 'info');
+                    log('login-result', `User: ${data.user.name} (${data.user.email})`, 'info');
+                    updateDebugInfo();
+                } else {
+                    log('login-result', `❌ Login failed: ${JSON.stringify(data)}`, 'error');
+                }
+            } catch (error) {
+                log('login-result', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testGetBackups() {
+            const resultEl = document.getElementById('api-result');
+            resultEl.innerHTML = '';
+            
+            if (!authToken) {
+                log('api-result', '❌ No auth token! Please login first.', 'error');
+                return;
+            }
+            
+            log('api-result', '🔄 GET /api/backups...', 'info');
+            
+            try {
+                const response = await fetch(`${API_URL}/backups`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    log('api-result', `✅ Success! Found ${data.length} backup(s)`, 'success');
+                    if (data.length > 0) {
+                        log('api-result', `Latest: ${data[0].filename} (${(data[0].size / 1024 / 1024).toFixed(2)} MB)`, 'info');
+                    }
+                    log('api-result', JSON.stringify(data, null, 2), 'info');
+                } else {
+                    log('api-result', `❌ Failed (${response.status}): ${JSON.stringify(data)}`, 'error');
+                }
+            } catch (error) {
+                log('api-result', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testCreateBackup() {
+            const resultEl = document.getElementById('api-result');
+            const btnCreate = document.getElementById('btn-create');
+            resultEl.innerHTML = '';
+            
+            if (!authToken) {
+                log('api-result', '❌ No auth token! Please login first.', 'error');
+                return;
+            }
+            
+            log('api-result', '🔄 POST /api/backups/run (Creating backup...)', 'info');
+            log('api-result', '⏳ This may take 10-60 seconds, please wait...', 'info');
+            
+            btnCreate.disabled = true;
+            btnCreate.textContent = '⏳ Creating...';
+            
+            const startTime = Date.now();
+            
+            try {
+                const response = await fetch(`${API_URL}/backups/run`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    log('api-result', `✅ Backup created successfully in ${elapsed}s!`, 'success');
+                    log('api-result', `Message: ${data.message}`, 'info');
+                    log('api-result', `File: ${data.file}`, 'info');
+                    log('api-result', JSON.stringify(data, null, 2), 'info');
+                } else {
+                    log('api-result', `❌ Failed (${response.status}) after ${elapsed}s`, 'error');
+                    log('api-result', JSON.stringify(data, null, 2), 'error');
+                }
+            } catch (error) {
+                const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+                log('api-result', `❌ Error after ${elapsed}s: ${error.message}`, 'error');
+                console.error('Full error:', error);
+            } finally {
+                btnCreate.disabled = false;
+                btnCreate.textContent = 'POST /api/backups/run (Create Backup)';
+            }
+        }
+        
+        // Auto-login if credentials are saved
+        if (!authToken) {
+            console.log('No token found, please login');
+        } else {
+            console.log('Token found:', authToken.substring(0, 30) + '...');
+        }
+    </script>
+</body>
+</html>
