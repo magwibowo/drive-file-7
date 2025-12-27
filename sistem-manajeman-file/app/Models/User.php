@@ -22,6 +22,7 @@ class User extends Authenticatable
         'password',
         'role_id',
         'division_id',
+        'last_activity_at', // Track concurrent users
     ];
 
     protected $hidden = [ // Nama variabel $hidden ditambahkan
@@ -32,6 +33,7 @@ class User extends Authenticatable
     protected $casts = [ // Nama variabel $casts ditambahkan
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'last_activity_at' => 'datetime', // Cast to Carbon instance
     ];
 
     public function division(): BelongsTo
@@ -47,5 +49,20 @@ class User extends Authenticatable
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class); // $this ditambahkan
+    }
+
+    /**
+     * Get count of concurrent active users
+     * Users yang aktif dalam X menit terakhir
+     *
+     * @param int $minutes Number of minutes to consider as "active"
+     * @return int
+     */
+    public static function getConcurrentUsers(int $minutes = 15): int
+    {
+        return static::where('last_activity_at', '>', now()->subMinutes($minutes))
+                    ->whereNull('deleted_at') // Exclude soft-deleted users
+                    ->distinct('id')
+                    ->count('id');
     }
 }

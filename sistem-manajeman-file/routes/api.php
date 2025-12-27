@@ -16,6 +16,15 @@ use App\Http\Controllers\Api\SuperAdminController;
 use App\Http\Controllers\Api\Admin\FolderController;
 use App\Http\Controllers\Api\ServerMetricsController;
 
+// Health check endpoint untuk monitoring (tidak perlu auth)
+Route::get('/health', function() {
+    return response()->json([
+        'status' => 'ok',
+        'timestamp' => now()->toIso8601String(),
+        'service' => 'Laravel File Management System'
+    ]);
+});
+
 // Rute Publik
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login');
 

@@ -9,21 +9,52 @@ class ServerMetric extends Model
     protected $table = 'server_metrics';
 
     protected $fillable = [
+        // TIER 2: System-wide Performance
         'network_rx_bytes_per_sec',
         'network_tx_bytes_per_sec',
         'disk_reads_per_sec',
         'disk_writes_per_sec',
         'disk_free_space',
         'latency_ms',
+        // TIER 1: Critical System Metrics
+        'cpu_usage_percent',
+        'memory_usage_percent',
+        'memory_available_mb',
+        'tcp_connections_total',
+        'tcp_connections_external',
+        'concurrent_users',
+        'disk_queue_length',
+        // TIER 3: Application-Specific Metrics
+        'app_network_bytes_per_sec',
+        'mysql_reads_per_sec',
+        'mysql_writes_per_sec',
+        'app_response_time_ms',
+        'app_requests_per_sec',
     ];
 
     protected $casts = [
+        // TIER 2: System-wide
         'network_rx_bytes_per_sec' => 'float',
         'network_tx_bytes_per_sec' => 'float',
         'disk_reads_per_sec' => 'float',
         'disk_writes_per_sec' => 'float',
         'disk_free_space' => 'integer',
         'latency_ms' => 'integer',
+        // TIER 1: Critical
+        'cpu_usage_percent' => 'float',
+        'memory_usage_percent' => 'float',
+        'memory_available_mb' => 'float',
+        'tcp_connections_total' => 'integer',
+        'tcp_connections_external' => 'integer',
+        'concurrent_users' => 'integer',
+        'disk_queue_length' => 'float',
+        // TIER 3: Application
+        'app_network_bytes_per_sec' => 'float',
+        'mysql_reads_per_sec' => 'float',
+        'mysql_writes_per_sec' => 'float',
+        'app_response_time_ms' => 'integer',
+        'app_requests_per_sec' => 'float',
+        // Timestamps
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];

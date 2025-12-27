@@ -209,6 +209,18 @@
   color: #ec4899;
 }
 
+.card-red {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+}
+
+.card-red .metric-title {
+  color: #991b1b;
+}
+
+.card-red .metric-icon {
+  color: #dc2626;
+}
+
 .metric-value {
   font-size: 1.875rem;
   font-weight: bold;

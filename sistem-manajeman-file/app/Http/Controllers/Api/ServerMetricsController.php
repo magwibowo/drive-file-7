@@ -66,24 +66,42 @@ class ServerMetricsController extends Controller
                 ]);
             }
 
-            // Hitung delta (current - previous) / 2 detik
-            $delta = [
-                'network_rx_bytes_per_sec' => max(0, ($currentSnapshot['network_rx_bytes_per_sec'] - $previousSnapshot['network_rx_bytes_per_sec']) / 2),
-                'network_tx_bytes_per_sec' => max(0, ($currentSnapshot['network_tx_bytes_per_sec'] - $previousSnapshot['network_tx_bytes_per_sec']) / 2),
-                'disk_reads_per_sec' => max(0, ($currentSnapshot['disk_reads_per_sec'] - $previousSnapshot['disk_reads_per_sec']) / 2),
-                'disk_writes_per_sec' => max(0, ($currentSnapshot['disk_writes_per_sec'] - $previousSnapshot['disk_writes_per_sec']) / 2),
+            // Return semua 16 metrics (TIER 1 + 2 + 3) langsung dari currentSnapshot
+            // Tidak perlu delta calculation karena WindowsMetricsService sudah return per-second rates
+            $metricsToSave = [
+                // TIER 2: System-wide Performance
+                'network_rx_bytes_per_sec' => $currentSnapshot['network_rx_bytes_per_sec'],
+                'network_tx_bytes_per_sec' => $currentSnapshot['network_tx_bytes_per_sec'],
+                'disk_reads_per_sec' => $currentSnapshot['disk_reads_per_sec'],
+                'disk_writes_per_sec' => $currentSnapshot['disk_writes_per_sec'],
                 'disk_free_space' => $currentSnapshot['disk_free_space'],
                 'latency_ms' => $currentSnapshot['latency_ms'],
+                
+                // TIER 1: Critical System Metrics
+                'cpu_usage_percent' => $currentSnapshot['cpu_usage_percent'],
+                'memory_usage_percent' => $currentSnapshot['memory_usage_percent'],
+                'memory_available_mb' => $currentSnapshot['memory_available_mb'],
+                'tcp_connections_total' => $currentSnapshot['tcp_connections_total'],
+                'tcp_connections_external' => $currentSnapshot['tcp_connections_external'],
+                'concurrent_users' => $currentSnapshot['concurrent_users'],
+                'disk_queue_length' => $currentSnapshot['disk_queue_length'],
+                
+                // TIER 3: Application-Specific Metrics
+                'app_network_bytes_per_sec' => $currentSnapshot['app_network_bytes_per_sec'],
+                'mysql_reads_per_sec' => $currentSnapshot['mysql_reads_per_sec'],
+                'mysql_writes_per_sec' => $currentSnapshot['mysql_writes_per_sec'],
+                'app_response_time_ms' => $currentSnapshot['app_response_time_ms'],
+                'app_requests_per_sec' => $currentSnapshot['app_requests_per_sec'],
             ];
 
             // Simpan metrics ke database
-            ServerMetric::create($delta);
+            ServerMetric::create($metricsToSave);
 
             return response()->json([
                 'success' => true,
                 'data' => [
                     'current' => $currentSnapshot,
-                    'delta' => $delta,
+                    'delta' => $metricsToSave, // Return all 16 metrics
                 ],
             ]);
         } catch (Exception $e) {
@@ -132,43 +150,53 @@ class ServerMetricsController extends Controller
     }
 
     /**
-     * Ambil 1 data metrics terbaru dari database (read-only)
-     * Endpoint ini TIDAK melakukan WMI query, hanya membaca dari tabel
+     * Ambil metrics REAL-TIME dari WMI (bukan dari database)
+     * PENTING: Endpoint ini langsung query WMI, bukan baca tabel
      *
      * @return JsonResponse
      */
     public function latest(): JsonResponse
     {
         try {
-            // Ambil data terbaru menggunakan Eloquent
-            $latestMetric = ServerMetric::latest('created_at')->first();
+            // Query WMI langsung untuk data real-time
+            $metrics = $this->metricsService->getMetrics();
 
-            // Jika tidak ada data
-            if (!$latestMetric) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'No metrics data available',
-                    'data' => null,
-                ], 404);
-            }
-
-            // Format response sesuai permintaan
+            // Format response dengan 16 metrics (TIER 1 + 2 + 3)
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'rx' => $latestMetric->network_rx_bytes_per_sec,
-                    'tx' => $latestMetric->network_tx_bytes_per_sec,
-                    'reads' => $latestMetric->disk_reads_per_sec,
-                    'writes' => $latestMetric->disk_writes_per_sec,
-                    'free_space' => $latestMetric->disk_free_space,
-                    'latency' => $latestMetric->latency_ms,
-                    'timestamp' => $latestMetric->created_at->toIso8601String(),
+                    // TIER 2: System-wide Performance
+                    'rx' => $metrics['network_rx_bytes_per_sec'],
+                    'tx' => $metrics['network_tx_bytes_per_sec'],
+                    'latency' => $metrics['latency_ms'],
+                    'reads' => $metrics['disk_reads_per_sec'],
+                    'writes' => $metrics['disk_writes_per_sec'],
+                    'free_space' => $metrics['disk_free_space'],
+                    
+                    // TIER 1: Critical System Metrics
+                    'cpu_usage_percent' => $metrics['cpu_usage_percent'],
+                    'memory_usage_percent' => $metrics['memory_usage_percent'],
+                    'memory_available_mb' => $metrics['memory_available_mb'],
+                    'tcp_connections_total' => $metrics['tcp_connections_total'],
+                    'tcp_connections_external' => $metrics['tcp_connections_external'],
+                    'concurrent_users' => $metrics['concurrent_users'],
+                    'disk_queue_length' => $metrics['disk_queue_length'],
+                    
+                    // TIER 3: Application-Specific Metrics
+                    'app_network_bytes_per_sec' => $metrics['app_network_bytes_per_sec'],
+                    'mysql_reads_per_sec' => $metrics['mysql_reads_per_sec'],
+                    'mysql_writes_per_sec' => $metrics['mysql_writes_per_sec'],
+                    'app_response_time_ms' => $metrics['app_response_time_ms'],
+                    'app_requests_per_sec' => $metrics['app_requests_per_sec'],
+                    
+                    // Timestamp
+                    'timestamp' => now()->toIso8601String(),
                 ],
             ]);
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => 'Failed to fetch real-time metrics: ' . $e->getMessage(),
             ], 500);
         }
     }
