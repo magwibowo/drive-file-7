@@ -54,6 +54,28 @@ class Kernel extends ConsoleKernel
                     break;
             }
         }
+
+        // Auto-cleanup trash: Delete files older than 30 days every day at 3 AM
+        $schedule->command('trash:cleanup --days=30')
+            ->dailyAt('03:00')
+            ->name('Auto Trash Cleanup')
+            ->onSuccess(function () {
+                \Log::info('Trash cleanup completed successfully');
+            })
+            ->onFailure(function () {
+                \Log::error('Trash cleanup failed');
+            });
+
+        // Auto-fix folders without hash: Run every day at 4 AM
+        $schedule->command('folders:auto-fix-hash')
+            ->dailyAt('04:00')
+            ->name('Auto Fix Folder Hash')
+            ->onSuccess(function () {
+                \Log::info('Auto-fix folder hash completed successfully');
+            })
+            ->onFailure(function () {
+                \Log::error('Auto-fix folder hash failed');
+            });
     }
 
     /**

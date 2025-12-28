@@ -55,10 +55,11 @@ class FolderController extends Controller
             'user_id' => $user->id,
             'parent_folder_id' => $validated['parent_folder_id'] ?? null,
         ]);
+        // Hash auto-generated via Model boot() event - no need manual generation
 
         // Buat direktori fisik
         $folder->loadMissing('division', 'parent');
-        Storage::makeDirectory($folder->getFullPath());
+        Storage::disk('nas_uploads')->makeDirectory($folder->getFullPath());
 
         return response()->json($folder, 201);
     }

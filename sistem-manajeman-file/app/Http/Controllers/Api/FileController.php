@@ -283,6 +283,10 @@ public function store(Request $request)
             $existingActiveFile->forceDelete();
         }
         
+        // Move file back from trash to original location
+        $this->restoreFromTrash($file);
+        
+        // Restore in database
         $file->restore();
 
         if ($newName) {
@@ -297,8 +301,14 @@ public function store(Request $request)
     {
         $file = File::onlyTrashed()->findOrFail($fileId);
         $this->authorize('forceDelete', $file);
-        Storage::disk('nas_uploads')->delete($file->path_penyimpanan);
+        
+        // Delete from trash folder
+        $trashPath = $this->getTrashPath($file);
+        Storage::disk('nas_uploads')->delete($trashPath);
+        
+        // Force delete from database
         $file->forceDelete();
+        
         return response()->json(['message' => 'File berhasil dihapus permanen.']);
     }
 
@@ -325,7 +335,13 @@ public function store(Request $request)
     {
         $file = File::findOrFail($fileId);
         $this->authorize('delete', $file);
+        
+        // Move file to trash folder
+        $this->moveToTrash($file);
+        
+        // Soft delete in database
         $file->delete();
+        
         return response()->json(['message' => 'File berhasil dipindahkan ke sampah.']);
     }
 
@@ -351,5 +367,60 @@ public function store(Request $request)
         }
         
         return $newName;
+    }
+
+    /**
+     * Move file to trash folder
+     */
+    private function moveToTrash(File $file)
+    {
+        $originalPath = $file->path_penyimpanan;
+        $trashPath = $this->getTrashPath($file);
+        
+        // Ensure trash directory exists
+        $trashDir = dirname($trashPath);
+        if (!Storage::disk('nas_uploads')->exists($trashDir)) {
+            Storage::disk('nas_uploads')->makeDirectory($trashDir);
+        }
+        
+        // Move file to trash
+        if (Storage::disk('nas_uploads')->exists($originalPath)) {
+            Storage::disk('nas_uploads')->move($originalPath, $trashPath);
+        }
+    }
+
+    /**
+     * Restore file from trash back to original location
+     */
+    private function restoreFromTrash(File $file)
+    {
+        $trashPath = $this->getTrashPath($file);
+        $originalPath = $file->path_penyimpanan;
+        
+        // Ensure original directory exists
+        $originalDir = dirname($originalPath);
+        if (!Storage::disk('nas_uploads')->exists($originalDir)) {
+            Storage::disk('nas_uploads')->makeDirectory($originalDir);
+        }
+        
+        // Move file back from trash
+        if (Storage::disk('nas_uploads')->exists($trashPath)) {
+            Storage::disk('nas_uploads')->move($trashPath, $originalPath);
+        }
+    }
+
+    /**
+     * Get trash folder path for a file
+     * Structure: trash/division_id/YYYY-MM-DD/original_filename
+     */
+    private function getTrashPath(File $file)
+    {
+        // Use deleted_at date for organizing trash folder
+        $deletedDate = $file->deleted_at ? $file->deleted_at->format('Y-m-d') : now()->format('Y-m-d');
+        
+        // Extract filename from original path
+        $filename = basename($file->path_penyimpanan);
+        
+        return "trash/{$file->division_id}/{$deletedDate}/{$filename}";
     }
 }
