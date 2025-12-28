@@ -1,0 +1,9 @@
+/* src/components/RenameModal/RenameModal.css */
+.rename-modal-body .form-input {
+    width: 100%;
+    padding: 8px;
+    margin-top: 8px;
+    margin-bottom: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}

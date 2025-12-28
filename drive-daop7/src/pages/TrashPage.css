@@ -1,0 +1,29 @@
+/* src/pages/TrashPage.css */
+
+.action-button {
+    border: none;
+    padding: 8px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: white;
+    font-weight: 500;
+    font-size: 0.85rem;
+    transition: background-color 0.2s ease;
+    margin-right: 8px;
+}
+
+.restore-button {
+    background-color: #28a745; /* Hijau */
+}
+
+.restore-button:hover {
+    background-color: #218838;
+}
+
+.delete-button {
+    background-color: #dc3545; /* Merah */
+}
+
+.delete-button:hover {
+    background-color: #c82333;
+}

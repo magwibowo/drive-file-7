@@ -1,0 +1,64 @@
+/* src/components/FileUploadForm/FileUploadForm.css */
+
+.upload-form-container {
+    padding: 1rem;
+}
+
+.drop-zone {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    border: 2px dashed #d1d5db;
+    border-radius: 12px;
+    background-color: #f9fafb;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+    text-align: center;
+    color: #6b7280;
+}
+
+.drop-zone.is-active {
+    background-color: #e7f1ff;
+    border-color: #0d6efd;
+}
+
+.drop-zone-icon {
+    font-size: 3rem;
+    color: #0D2A51; /* Biru KAI */
+}
+
+.drop-zone p {
+    margin: 0.5rem 0 0 0;
+    font-weight: 500;
+}
+
+.file-preview {
+    margin-top: 1.5rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.upload-button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 1.5rem;
+    background-color: #F58220; /* Oranye KAI */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.upload-button:hover {
+    background-color: #e0701b;
+}
+
+.upload-button:disabled {
+    background-color: #adb5bd;
+    cursor: not-allowed;
+}

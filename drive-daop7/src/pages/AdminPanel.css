@@ -1,0 +1,131 @@
+/* src/pages/AdminPanel.css */
+
+.admin-page-container {
+    padding: 1.5rem 2rem;
+}
+
+.admin-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.admin-page-header h2, .admin-page-container h3 {
+    font-size: 1.7rem;
+    font-weight: 600;
+    margin: 0 0 1.5rem 0;
+}
+
+/* Header baru dua tingkat */
+.admin-header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.page-subtitle {
+    font-size: 14px;
+    color: #6c757d;
+    display: block;
+}
+
+.page-main-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin-top: 4px;
+    color: #212529;
+}
+
+/* Controls: posisi ikon sampah */
+.controls-container {
+    display: flex;
+    align-items: center; /* sejajar vertikal */
+    gap: 16px; /* jarak antar elemen */
+    margin-top: 0; /* <-- TAMBAHKAN BARIS INI */
+}
+
+.controls-container a[title="Lihat User di Sampah"] {
+    font-size: 1.6em; /* perbesar ikon */
+    color: #6c757d; /* abu-abu konsisten */
+    display: flex;
+    align-items: center;
+}
+
+.controls-container a[title="Lihat User di Sampah"]:hover {
+    color: #343a40;
+}
+
+.add-user-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background-color: #0D2A51;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.form-container {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+    max-width: 600px;
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #495057;
+}
+
+.form-input {
+    width: 100%;
+    padding: 10px 14px;
+    box-sizing: border-box;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-input:focus {
+    border-color: #0D2A51;
+    box-shadow: 0 0 0 3px rgba(13, 42, 81, 0.1);
+    outline: none;
+}
+
+.form-button {
+    width: 100%;
+    padding: 12px;
+    background-color: #F58220; /* Oranye KAI */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+.search-bar-admin {
+    width: 100%;
+    max-width: 500px; /* Diperbesar dari 400px */
+    padding: 10px 15px; /* Sedikit lebih besar */
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+}
+
+.form-button:hover {
+    background-color: #e0701b;
+}
+

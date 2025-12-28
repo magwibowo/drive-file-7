@@ -1,0 +1,76 @@
+/* src/components/NewSidebar/NewSidebar.css */
+.new-sidebar {
+    width: 250px;
+    height: 100vh;
+    background-color: #f8f9fa;
+    border-right: 1px solid #dee2e6;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem; /* Disederhanakan dari 1rem 1rem */
+}
+
+.sidebar-logo {
+    padding: 1.5rem 0; /* Padding atas-bawah, 0 untuk kiri-kanan agar bisa center */
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: center; /* Menengahkan logo */
+}
+
+.sidebar-logo-img {
+    max-width: 100%;
+    width: 150px; /* Atur lebar logo sesuai kebutuhan */
+    height: auto;
+    display: block;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.menu-item a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 1rem;
+    text-decoration: none;
+    color: #495057;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.menu-item a:hover {
+    background-color: #e9ecef;
+}
+
+.menu-item a.active {
+    background-color: #e7f1ff;
+    color: #0d6efd;
+    font-weight: 600;
+}
+
+.sidebar-storage {
+    margin-top: auto; /* Mendorong ke bawah */
+    padding: 1rem;
+}
+
+.storage-bar {
+    height: 8px;
+    background-color: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.storage-bar-fill {
+    height: 100%;
+    background-color: #0d6efd;
+    width: 25%; /* Contoh: 128GB dari 512GB */
+}
+
+.storage-text {
+    font-size: 0.8rem;
+    color: #6c757d;
+}

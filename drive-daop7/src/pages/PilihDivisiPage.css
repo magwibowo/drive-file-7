@@ -1,0 +1,116 @@
+/* File: src/pages/PilihDivisiPage.css (VERSI FINAL) */
+
+.pilih-divisi-page {
+    padding: 1.5rem;
+}
+
+.pilih-divisi-page h1 {
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+}
+
+.division-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.division-card {
+    background-color: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-decoration: none;
+    color: #343a40;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.division-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.division-card h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1.2rem;
+}
+
+.division-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: #6c757d;
+    flex-grow: 1; /* Membuat stats mengisi ruang */
+    justify-content: space-between; /* Mendorong progress bar ke bawah */
+}
+
+.division-stats span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sort-controls {
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sort-controls span {
+    font-weight: 500;
+    color: #6c757d;
+}
+
+.sort-controls button {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    color: #343a40;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.sort-controls button.active {
+    background-color: #0d6efd;
+    color: white;
+    border-color: #0d6efd;
+}
+
+.storage-info {
+    width: 100%;
+    margin-top: 1rem; /* Memberi jarak dari info folder */
+}
+
+/* --- STYLE UNTUK PROGRESS BAR (BARU) --- */
+.progress-bar-container {
+    width: 100%;
+    background-color: #e9ecef;
+    border-radius: 10px;
+    height: 8px; /* Dibuat lebih tipis */
+    margin-top: 0.5rem;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.3s ease-in-out, background-color 0.3s ease-in-out;
+}
+
+/* KUNCI WARNA DINAMIS */
+.progress-bar.primary {
+  background-color: #13da05; /* Biru */
+}
+
+.progress-bar.warning {
+  background-color: #ffc107; /* Kuning */
+}
+
+.progress-bar.danger {
+  background-color: #dc3545; /* Merah */
+}

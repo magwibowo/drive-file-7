@@ -1,0 +1,39 @@
+/* src/components/Dashboard/Pagination.css */
+.pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    margin-top: 1.5rem;
+    border-top: 1px solid #f0f0f0;
+    font-size: 0.9rem;
+}
+
+.pagination-info {
+    color: #6c757d;
+}
+
+.pagination-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.pagination-button {
+    padding: 8px 12px;
+    border: 1px solid #dee2e6;
+    background-color: #fff;
+    color: #0d6efd;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.pagination-button:hover:not(:disabled) {
+    background-color: #f8f9fa;
+}
+
+.pagination-button:disabled {
+    color: #6c757d;
+    cursor: not-allowed;
+    background-color: #e9ecef;
+}

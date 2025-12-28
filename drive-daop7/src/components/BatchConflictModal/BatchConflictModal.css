@@ -1,0 +1,450 @@
+/* Override modal-body untuk BatchConflictModal */
+:global(.modal-body:has(.batch-conflict-modal)) {
+    background-color: #ffffff;
+    padding: 24px;
+}
+
+.batch-conflict-modal {
+    max-width: 700px;
+    min-height: 300px;
+    overflow-x: hidden;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.conflict-warning {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+    background-color: #fff5ed;
+    border: 2px solid #e4640c;
+    border-radius: 6px;
+    margin-bottom: 24px;
+}
+
+.warning-icon {
+    color: #e4640c;
+    font-size: 24px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.conflict-warning p {
+    margin: 0;
+    color: #92400e;
+    line-height: 1.5;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+/* Initial Options View */
+.initial-options {
+    padding: 10px 0;
+}
+
+.options-title {
+    text-align: center;
+    font-size: 17px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.option-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.option-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 18px;
+    border: 2px solid #e5e7eb;
+    border-radius: 6px;
+    background: #ffffff;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-align: left;
+}
+
+.option-card:hover {
+    border-color: #232368;
+    background: #f9fafb;
+    box-shadow: 0 2px 6px rgba(35, 35, 104, 0.1);
+}
+
+.option-card.danger:hover {
+    border-color: #e4640c;
+    background: #fff5ed;
+    box-shadow: 0 2px 6px rgba(228, 100, 12, 0.1);
+}
+
+.option-card.success:hover {
+    border-color: #232368;
+    background: #f5f5fa;
+    box-shadow: 0 2px 6px rgba(35, 35, 104, 0.1);
+}
+
+.option-icon {
+    font-size: 28px;
+    flex-shrink: 0;
+    color: #6b7280;
+    transition: color 0.15s ease;
+}
+
+.option-card:hover .option-icon {
+    color: #232368;
+}
+
+.option-card.danger:hover .option-icon {
+    color: #e4640c;
+}
+
+.option-card.success:hover .option-icon {
+    color: #232368;
+}
+
+.option-content {
+    flex: 1;
+}
+
+.option-content h3 {
+    margin: 0 0 4px 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.option-content p {
+    margin: 0;
+    font-size: 12px;
+    color: #7f8c8d;
+    line-height: 1.3;
+}
+
+.conflict-files-list {
+    max-height: 420px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 4px;
+}
+
+.conflict-file-item {
+    background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+    border: 2px solid #e8eaed;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 14px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.conflict-file-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, #4a90e2 0%, #357abd 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.conflict-file-item:hover {
+    border-color: #cde4ff;
+    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.15);
+    transform: translateY(-2px);
+}
+
+.conflict-file-item:hover::before {
+    opacity: 1;
+}
+
+.conflict-file-item:last-child {
+    margin-bottom: 0;
+}
+
+.file-info {
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid #f0f3f5;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.file-icon {
+    font-size: 22px;
+    color: #6b7280;
+    flex-shrink: 0;
+}
+
+.file-info-content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.file-info strong {
+    display: block;
+    color: #1a1f36;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.file-message {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #92400e;
+    font-size: 12px;
+    font-weight: 500;
+    background-color: #fff5ed;
+    padding: 4px 10px;
+    border-radius: 4px;
+    border: 1px solid #e4640c;
+}
+
+.file-message::before {
+    content: '⚠️';
+    font-size: 12px;
+}
+
+.action-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+}
+
+.action-btn {
+    flex: 1;
+    min-width: fit-content;
+    padding: 6px 12px;
+    border: 2px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    position: relative;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: #ffffff;
+    color: #4b5563;
+}
+
+.action-btn:hover {
+    border-color: #9ca3af;
+    background: #f9fafb;
+}
+
+/* Skip Button */
+.skip-btn.active {
+    background: #6b7280;
+    border-color: #6b7280;
+    color: white;
+}
+
+/* Overwrite Button */
+.overwrite-btn.active {
+    background: #e4640c;
+    border-color: #e4640c;
+    color: white;
+}
+
+/* Rename Auto Button */
+.rename-auto-btn.active {
+    background: #232368;
+    border-color: #232368;
+    color: white;
+}
+
+/* Rename Button */
+.rename-btn.active {
+    background: #232368;
+    border-color: #232368;
+    color: white;
+}
+
+.file-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.rename-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.15s ease;
+    background: #ffffff;
+    color: #1f2937;
+    font-weight: 500;
+    margin-top: 8px;
+    box-sizing: border-box;
+}
+
+.rename-input::placeholder {
+    color: #9ca3af;
+    font-weight: 400;
+}
+
+.rename-input:hover {
+    border-color: #9ca3af;
+}
+
+.rename-input:focus {
+    outline: none;
+    border-color: #232368;
+    box-shadow: 0 0 0 3px rgba(35, 35, 104, 0.1);
+}
+
+.rename-input.error {
+    border-color: #dc2626;
+    background: #fef2f2;
+}
+
+.rename-input.error:focus {
+    border-color: #dc2626;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.rename-error {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #dc2626;
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 6px;
+    padding: 6px 10px;
+    background: #fef2f2;
+    border-radius: 4px;
+    border: 1px solid #fca5a5;
+}
+
+.rename-warning {
+    display: inline-block;
+    color: #92400e;
+    font-size: 12px;
+    font-weight: 500;
+    margin-top: 6px;
+    padding: 6px 10px;
+    background: #fff5ed;
+    border-radius: 4px;
+}
+
+.batch-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 2px solid #e5e7eb;
+}
+
+.modal-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 30px;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 100px;
+    min-height: 40px;
+    justify-content: center;
+    border: 2px solid transparent;
+    color: white;
+    box-sizing: border-box;
+}
+
+.modal-button svg {
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.modal-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.modal-button:active {
+    transform: translateY(0);
+}
+
+.cancel-button {
+    background: #6b7280;
+    border-color: #6b7280;
+}
+
+.cancel-button:hover {
+    background: #4b5563;
+    border-color: #4b5563;
+}
+
+.confirm-button {
+    background: #232368;
+    border-color: #232368;
+}
+
+.confirm-button:hover {
+    background: #1a1a50;
+    border-color: #1a1a50;
+}
+
+.modal-button:disabled {
+    background: #d1d5db;
+    border-color: #d1d5db;
+    color: #9ca3af;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.modal-button:disabled:hover {
+    background: #d1d5db;
+    border-color: #d1d5db;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Scrollbar styling */
+.conflict-files-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.conflict-files-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.conflict-files-list::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.conflict-files-list::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}

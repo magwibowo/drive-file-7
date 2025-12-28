@@ -1,0 +1,63 @@
+[33md25633e[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/log-admin-revisi-ui[m[33m, [m[1;32mlog-admin-revisi-ui[m[33m)[m revisi fungsi date pada timeline log
+[33made2282[m env local
+[33m02d429e[m env local
+[33m42883b2[m[33m ([m[1;31morigin/production_ui[m[33m)[m menambah alert
+[33m1f46beb[m memperbaiki bug pada fitur backup dan memperbaiki tabel di fitur backup
+[33ma8a4d79[m merge branch feature/backup-fix ke branch production_ui
+[33mfc51b0e[m memperbaki tabel login hinstory,kelola pengguna
+[33md283bfe[m Merge remote-tracking branch 'origin/account-register-ui' into production_ui
+[33m79caddb[m[33m ([m[1;31morigin/feature/backup-fix[m[33m)[m feat: backup fix
+[33me17fda9[m hasil merge branch log-activity-admin-ui ke branch partisi-storage-ui dan beberapa perbaikan
+[33m6b213d4[m[33m ([m[1;31morigin/account-register-ui[m[33m)[m Alert, Form, alert filtering input Create Update Akun
+[33m2391ff8[m[33m ([m[1;31morigin/log-activity-admin-ui[m[33m)[m Pembaruan pada Tabel Activity Log pada Super Admin
+[33m1f51f54[m Timeline Divisi dari  Log Activity
+[33mb440f39[m Tampilan Tabel dari Division Log Activity
+[33m0fb8dbf[m[33m ([m[1;31morigin/partisi-storage-ui[m[33m)[m update branch dan ui
+[33ma28fc4e[m memperbaiki bug ui saat merge pada tampilan log aktivity kelola divisi dan history login dan bug pada upload dokumen di dashboard super admin
+[33m620580c[m Resolve merge conflicts: FileUploadForm.js & DashboardPage.js (merge superadmin-dashboard-ui ke branch partisi-storage-ui)
+[33md8206b4[m memperbaiki tampilan dashboard superadmin dan log aktivity
+[33me547faf[m[33m ([m[1;31morigin/superadmin-dashboard-ui[m[33m)[m perbaikan dropdown dan fungsi upload file pada folder dan root untuk role superadmin
+[33m2918020[m menambah fitur untuk super admin atur kuota per devisi dan memperbaiki tampilan ui untuk progres bar,kelola folder disuperadmin
+[33m1425ca6[m superadmin pilih divisi dropdown
+[33ma62b9e7[m tampilan superadmin dashboard saat menampilkan divisi
+[33mb1f3b36[m tampilan superadmin searchbar pada kelola user dan divisi dan delete pada log activity
+[33mc036d63[m Memperbaiki konflik saat merge
+[33m86714fd[m[33m ([m[1;31morigin/kelola-folder-superadmin-ui[m[33m)[m merge branch preview-session-ui kebranch kelola-folder-superadmin-ui
+[33mc5be81e[m Resolve merge conflicts on App.js and DashboardPage
+[33m04a12ce[m menambah fitur kelola folder didalam sidebar level super admin ui
+[33meb732a8[m[33m ([m[1;31morigin/preview-session-ui[m[33m)[m fungsi dan tampilan life active session 15 menit dengan alert pada modal
+[33m1db6551[m fungsi 3x login salah keblokir 5 menit
+[33m2bde873[m hide print dependensi
+[33mb9fb0fc[m memperbaiki ui kelola folder di admin devisi
+[33m8714216[m Tampilan & Fungsi Preview Audio, PDF, DOCX, XLSX
+[33mdf28a15[m Fungsi preview
+[33m3c9d228[m PDF preview
+[33mabd1b9c[m[33m ([m[1;31morigin/history-login-ui[m[33m)[m memperbaiki progres bar dan fitur replase file
+[33mde7b483[m[33m ([m[1;31morigin/feature/backup-data-ui[m[33m)[m feat: implementasi backup otomatis dengan spatie
+[33m6a07417[m Menambahkan fitur login history ui
+[33me41b746[m file-upload
+[33m0586ce8[m MERGE BRANCH fitur-file-ui
+[33m8415439[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/NEW-FILEUPLOAD-MERGE-MAIN-UI[m[33m, [m[1;31morigin/HEAD[m[33m)[m perubahan terbaru merge main yg ada kelola folder ke branch file-upload-ui
+[33mbd9a463[m[33m ([m[1;31morigin/fitur-file-ui[m[33m)[m filter-bar pada Favorit, Terbaru, dan Sampah
+[33m6c7a1cd[m merge ui
+[33m95e1464[m push
+[33m01649ad[m Merge branch 'feature/kelola-folder-ui'
+[33m0d54774[m Merge branch 'login-logo-ui'
+[33m4632103[m[33m ([m[1;31morigin/feature/kelola-folder-ui[m[33m)[m ui(dashboard): breadcrumb dinamis + separator '>' + sembunyikan h1 di root ui(dashboard): pisahkan grid folder & list file + tambah style grid ui(dashboard): ikon folder kuning & hilangkan border kartu folder ui(kelola-folder): breadcrumb pakai “{Divisi} Drive” + CSS pointer/hover ui(sidebar): ganti “Panel Admin” dengan logo /images/DAOP7DRVE.svg
+[33m0c0f28c[m[33m ([m[1;31morigin/login-logo-ui[m[33m)[m logo on login-page and new-sidebar, and background-picture on login-page
+[33m6cc153e[m[33m ([m[1;31morigin/file-upload-ui[m[33m)[m dashboard, type-icon-file, sort&filter, action-toolbar, grid-list-layout, sticky-header
+[33m4b6b693[m feat: implementasi fitur kelola folder untuk admin devisi- UI
+[33m20fa6fc[m[33m ([m[1;31morigin/feature/panel-super-admin-manajemen-ui[m[33m)[m menambah fungsi untuk log aktifitas dan kelola devisi kelola anggota dan  perbaikan ui
+[33mf7ada2f[m Implementasi panel super admin (manajemen) UI
+[33md17abb8[m[33m ([m[1;31morigin/feature/panel-super-admin-beranda-UI[m[33m)[m memperbaiki panel super admin  menu beranda
+[33m5508eae[m[33m ([m[1;31morigin/panel-super-admin-ui[m[33m)[m admin): Implementasi konsol super admin dan otorisasi
+[33m55bae49[m[33m ([m[1;31morigin/feature/login-nipp-email-ui[m[33m)[m feat: Update login page UI for NIPP or Email
+[33m7cc5b13[m menambah import FILEPREVIEWMODAL
+[33m9930763[m Resolve merge conflict in src/App.js/DashboardPage.js
+[33meb6d179[m[33m ([m[1;31morigin/replace_ui[m[33m)[m tampilan dari fitur overwrite ui trash-restore dan confirm-loop modals
+[33m1dc710c[m fitur overwrite ui
+[33m056eb55[m[33m ([m[1;31morigin/feat-file-preview-ui[m[33m)[m menambahkan ui fitur file preview
+[33m20c73d2[m[33m ([m[1;31morigin/panel-admin-ui[m[33m)[m fitur tampilan di  admin panel UI
+[33m680ded3[m "update"
+[33me4cbfc8[m ui untuk sistem manajeman file kai daop 7
+[33m2f9c840[m Initialize project using Create React App

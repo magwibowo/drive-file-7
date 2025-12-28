@@ -1,0 +1,11 @@
+.super-admin-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f4f7f6; /* Warna latar belakang abu-abu muda untuk keseluruhan layout */
+}
+
+.super-admin-content {
+  flex-grow: 1; /* Membuat area konten mengisi sisa ruang */
+  padding: 24px;
+  overflow-y: auto; /* Tambahkan scroll jika konten panjang */
+}

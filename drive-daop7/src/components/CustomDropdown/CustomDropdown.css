@@ -1,0 +1,75 @@
+/* src/components/CustomDropdown/CustomDropdown.css */
+.custom-dropdown {
+    position: relative;
+    display: inline-block;
+    font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.dropdown-trigger-b {
+    background-color: #e4640c;
+    color: white;
+    padding: 8px 12px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    font-family: inherit; /* Force inherit font */
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: background-color 0.2s;
+}
+
+.dropdown-trigger-b:hover {
+    background-color: #c8580a;
+}
+
+.dropdown-trigger-b .arrow {
+    margin-left: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    display: inline-block;
+    padding: 3px;
+    transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+    transition: transform 0.2s ease-in-out;
+}
+
+.dropdown-trigger-b .arrow.up {
+    transform: rotate(-135deg);
+    -webkit-transform: rotate(-135deg);
+}
+
+.dropdown-menu-b {
+    display: block;
+    position: absolute;
+    background-color: #ffffff;
+    width: 100%;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 100;
+    border-radius: 5px;
+    padding: 5px 0;
+    margin-top: 5px; /* Add a small margin from the button */
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+}
+
+.dropdown-item-b {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    cursor: pointer;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    font-size: 15px;
+    font-family: inherit;
+}
+
+.dropdown-item-b:hover {
+    background-color: #b4b4b4;
+}
