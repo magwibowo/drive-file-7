@@ -71,16 +71,6 @@ export default function NasMonitorDashboard() {
 
   return (
     <div className="nas-monitor-dashboard" style={{ padding: '24px', maxWidth: '1400px', margin: '0 auto' }}>
-      {/* Debug Info */}
-      <div style={{ padding: '12px', backgroundColor: '#f3f4f6', borderRadius: '8px', marginBottom: '16px', fontSize: '12px', fontFamily: 'monospace' }}>
-        <div><strong>Debug Info:</strong></div>
-        <div>Loading: {loading ? 'YES' : 'NO'}</div>
-        <div>Error: {error || 'None'}</div>
-        <div>Available: {nasMetrics.available ? 'YES' : 'NO'}</div>
-        <div>Total Space: {nasMetrics.total_space}</div>
-        <div>Polling: {isPolling ? 'YES' : 'NO'}</div>
-      </div>
-
       {/* Header */}
       <div className="dashboard-header">
         <div>

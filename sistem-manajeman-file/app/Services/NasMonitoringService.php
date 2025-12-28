@@ -9,6 +9,10 @@ class NasMonitoringService
     private string $nasDrive;
     private string $nasIp;
     private string $nasShareName;
+    
+    // Cache untuk IOPS measurements (consistency dalam satu request)
+    private ?float $cachedReadIops = null;
+    private ?float $cachedWriteIops = null;
 
     public function __construct()
     {
@@ -146,22 +150,77 @@ class NasMonitoringService
 
     /**
      * Test network latency to NAS via ping
+     * 
+     * Pings the actual NAS IP address (not localhost).
+     * Falls back to localhost if NAS IP is not configured or unreachable.
      *
-     * @return int|null
+     * @return int|null Latency in milliseconds, or null if unreachable
      */
     private function getNasLatency(): ?int
     {
         try {
+            // Validate that we're not pinging localhost
+            $targetIp = $this->nasIp;
+            
+            // Warn if using localhost (development only)
+            if (in_array($targetIp, ['127.0.0.1', 'localhost', '::1'])) {
+                // In development, try to get real NAS IP from drive mapping
+                $realNasIp = $this->detectNasIpFromDrive();
+                if ($realNasIp && $realNasIp !== '127.0.0.1') {
+                    $targetIp = $realNasIp;
+                }
+            }
+
             $output = [];
             $returnCode = 0;
 
-            exec("ping -n 1 {$this->nasIp}", $output, $returnCode);
+            // Ping with 1 packet, 500ms timeout (faster response)
+            exec("ping -n 1 -w 500 {$targetIp}", $output, $returnCode);
 
             if ($returnCode === 0 && !empty($output)) {
                 foreach ($output as $line) {
                     // Match both "time=Xms" and "time<Xms"
                     if (preg_match('/time[<=](\d+)ms/i', $line, $matches)) {
                         return (int) $matches[1];
+                    }
+                    // Handle "time=X.Xms" (decimal milliseconds)
+                    if (preg_match('/time[<=]([\d.]+)ms/i', $line, $matches)) {
+                        return (int) round((float) $matches[1]);
+                    }
+                }
+            }
+
+            return null;
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Attempt to detect real NAS IP from mapped drive
+     * 
+     * Uses 'net use' command to find UNC path and extract IP
+     *
+     * @return string|null
+     */
+    private function detectNasIpFromDrive(): ?string
+    {
+        try {
+            // Example: net use Z: | findstr "Remote"
+            $command = "net use {$this->nasDrive} 2>nul | findstr /i \"Remote\"";
+            $output = @shell_exec($command);
+            
+            if ($output) {
+                // Extract IP from UNC path like \\192.168.1.100\share
+                if (preg_match('/\\\\\\\\([0-9.]+)\\\\/', $output, $matches)) {
+                    return $matches[1];
+                }
+                // Extract hostname and resolve to IP
+                if (preg_match('/\\\\\\\\([a-zA-Z0-9.-]+)\\\\/', $output, $matches)) {
+                    $hostname = $matches[1];
+                    $ip = @gethostbyname($hostname);
+                    if ($ip !== $hostname) {
+                        return $ip;
                     }
                 }
             }
@@ -256,11 +315,17 @@ class NasMonitoringService
     /**
      * Get NAS Read IOPS (via actual file operations)
      * Calculated from actual small file read operations
+     * Uses cache to ensure consistency within single request
      *
      * @return float|null
      */
     private function getNasReadIops(): ?float
     {
+        // Return cached value if already calculated
+        if ($this->cachedReadIops !== null) {
+            return $this->cachedReadIops;
+        }
+
         if (!$this->isNasAvailable()) {
             return null;
         }
@@ -284,8 +349,9 @@ class NasMonitoringService
             $duration = $endTime - $startTime;
 
             if ($duration > 0) {
-                // Calculate operations per second
-                return round($operations / $duration, 2);
+                // Calculate operations per second and cache it
+                $this->cachedReadIops = round($operations / $duration, 2);
+                return $this->cachedReadIops;
             }
 
             return null;
@@ -297,11 +363,17 @@ class NasMonitoringService
     /**
      * Get NAS Write IOPS (via actual file operations)
      * Calculated from actual small file write operations
+     * Uses cache to ensure consistency within single request
      *
      * @return float|null
      */
     private function getNasWriteIops(): ?float
     {
+        // Return cached value if already calculated
+        if ($this->cachedWriteIops !== null) {
+            return $this->cachedWriteIops;
+        }
+
         if (!$this->isNasAvailable()) {
             return null;
         }
@@ -327,8 +399,9 @@ class NasMonitoringService
             $duration = $endTime - $startTime;
 
             if ($duration > 0) {
-                // Calculate operations per second
-                return round($operations / $duration, 2);
+                // Calculate operations per second and cache it
+                $this->cachedWriteIops = round($operations / $duration, 2);
+                return $this->cachedWriteIops;
             }
 
             return null;
@@ -394,30 +467,85 @@ class NasMonitoringService
     }
 
     /**
-     * Get number of concurrent SMB users/sessions
+     * Get number of concurrent users
+     * 
+     * Uses database-based tracking for cross-platform compatibility.
+     * Falls back to SMB sessions on Windows Server if available.
+     * Optimized with query caching and selective SMB check.
      *
      * @return int
      */
     private function getConcurrentUsers(): int
     {
-        if (!$this->isNasAvailable()) {
-            return 0;
+        static $cachedResult = null;
+        static $cacheTime = null;
+        
+        // Cache for 5 seconds to avoid repeated database queries
+        if ($cachedResult !== null && $cacheTime !== null && (microtime(true) - $cacheTime) < 5) {
+            return $cachedResult;
         }
 
         try {
-            // For Windows Server - count SMB sessions
-            // Command: Get-SmbSession | Measure-Object | Select-Object -ExpandProperty Count
-            $command = 'powershell -Command "(Get-SmbSession | Measure-Object).Count"';
-            $output = shell_exec($command);
-            
-            if ($output !== null) {
-                return (int) trim($output);
+            // Primary method: Database-based tracking (works on all platforms)
+            // Count users active in last 15 minutes
+            // Use simple count() instead of get() for better performance
+            $dbUsers = \DB::table('users')
+                ->where('last_activity_at', '>=', now()->subMinutes(15))
+                ->count();
+
+            // Secondary method: SMB sessions (Windows Server only)
+            // Only attempt on Windows Server environments
+            if ($this->isWindowsServer()) {
+                $command = 'powershell -NoProfile -Command "(Get-SmbSession | Measure-Object).Count" 2>nul';
+                $output = @shell_exec($command);
+                
+                if ($output !== null && is_numeric(trim($output))) {
+                    $smbUsers = (int) trim($output);
+                    // Return the higher count (more accurate)
+                    $result = max($dbUsers, $smbUsers);
+                    
+                    // Cache the result
+                    $cachedResult = $result;
+                    $cacheTime = microtime(true);
+                    
+                    return $result;
+                }
             }
 
-            return 0;
+            // Cache the result
+            $cachedResult = $dbUsers;
+            $cacheTime = microtime(true);
+
+            return $dbUsers;
         } catch (Exception $e) {
             return 0;
         }
+    }
+
+    /**
+     * Check if running on Windows Server
+     * Uses cached result for performance
+     *
+     * @return bool
+     */
+    private function isWindowsServer(): bool
+    {
+        static $isServer = null;
+        
+        if ($isServer !== null) {
+            return $isServer;
+        }
+
+        if (PHP_OS_FAMILY !== 'Windows') {
+            $isServer = false;
+            return false;
+        }
+
+        // Check Windows version (cached statically)
+        $output = @shell_exec('wmic os get caption 2>nul');
+        $isServer = $output !== null && stripos($output, 'Server') !== false;
+        
+        return $isServer;
     }
 
     /**
