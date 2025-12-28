@@ -15,6 +15,14 @@ $app = new Illuminate\Foundation\Application(
     $_ENV['APP_BASE_PATH'] ?? dirname(__DIR__)
 );
 
+// Trust proxies for LAN deployment
+$app->bind('Illuminate\Http\Request', function ($app) {
+    $request = Illuminate\Http\Request::capture();
+    $request->setTrustedProxies(['10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16'], 
+        Illuminate\Http\Request::HEADER_X_FORWARDED_ALL);
+    return $request;
+});
+
 /*
 |--------------------------------------------------------------------------
 | Bind Important Interfaces

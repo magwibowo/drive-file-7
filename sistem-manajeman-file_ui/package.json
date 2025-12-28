@@ -1,7 +1,7 @@
 {
   "name": "file_ui",
   "version": "0.1.0",
-  "homepage": "/manajemen-file",
+  "homepage": "Cloud-Daop-7",
   "private": true,
   "dependencies": {
     "@testing-library/dom": "^10.4.0",
